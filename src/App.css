@@ -5,7 +5,7 @@
   background: linear-gradient(135deg, #f9f7f3 0%, #faf8f5 50%, #f9f7f3 100%);
   box-shadow: 0 4px 8px rgba(163, 24, 24, 0.12);
   border: 1.5px solid #ddd;
-  padding: 0; /* Removed padding */
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
