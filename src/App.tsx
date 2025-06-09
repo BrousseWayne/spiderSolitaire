@@ -2,18 +2,23 @@ import { useMemo, useState } from "react";
 import "./App.css";
 import { getCardImage } from "./cards";
 import Deck from "./deck";
-import type { CardProps } from "./types";
+import type { Card as CardType, CardProps } from "./types";
 import cardBack from "./assets/cards back/tile016.png";
 
-function Card({ suit, value, title }: CardProps & { title?: string }) {
-  const [flipped, setFlipped] = useState(false);
+function Card({
+  suit,
+  value,
+  title,
+  flipped,
+  onFlip,
+}: CardProps & { flipped: boolean; onFlip: () => void; title?: string }) {
   const frontImage = getCardImage(suit, value);
   const backImage = cardBack;
 
   return (
     <div
       className={`card ${flipped ? "flipped" : ""}`}
-      onClick={() => setFlipped(!flipped)}
+      onClick={onFlip}
       title={title}
     >
       <div className="card-inner">
@@ -31,20 +36,30 @@ function Card({ suit, value, title }: CardProps & { title?: string }) {
 function App() {
   const deck = useMemo(() => new Deck(2), []);
 
-  const cardsToShow = deck.cards.slice(0, 104);
+  const [cards, setCards] = useState(
+    deck.cards.map((card) => ({ ...card, flipped: true }))
+  );
+
+  function flipCard(index: number) {
+    setCards((prevCards) =>
+      prevCards.map((card, i) =>
+        i === index ? { ...card, flipped: !card.flipped } : card
+      )
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {cardsToShow.map((card, id) => {
-        return (
-          <Card
-            key={id}
-            suit={card.suit}
-            value={card.value}
-            title={`${card.value} of ${card.suit}`}
-          />
-        );
-      })}
+      {cards.map((card, index) => (
+        <Card
+          key={index}
+          suit={card.suit}
+          value={card.value}
+          flipped={card.flipped}
+          onFlip={() => flipCard(index)}
+          title={`${card.value} of ${card.suit}`}
+        />
+      ))}
     </div>
   );
 }
