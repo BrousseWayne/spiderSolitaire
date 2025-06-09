@@ -3,6 +3,8 @@
   height: 120px;
   perspective: 1000px;
   cursor: pointer;
+  position: absolute;
+  transition: top 0.2s;
 }
 
 .card-inner {
@@ -49,4 +51,29 @@
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
   z-index: 10;
+}
+
+.board {
+  display: flex;
+  gap: 16px; /* space between stacks */
+  padding: 20px;
+}
+
+.stack {
+  position: relative;
+  width: 100px; /* width of a card or stack */
+  height: 400px; /* enough height to see stacked cards */
+  border: 1px solid transparent; /* optional, for debug */
+}
+
+.stack .card:nth-child(1) {
+  top: 0px;
+}
+
+.stack .card:nth-child(2) {
+  top: 30px;
+}
+
+.stack .card:nth-child(3) {
+  top: 60px;
 }
