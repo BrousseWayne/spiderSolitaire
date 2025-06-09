@@ -17,8 +17,14 @@ export type CardValue =
 export type Card = {
   suit: CardSuit;
   value: CardValue;
+  flip: () => void;
 };
 
 export type RandomFunction = () => number;
 
 export type CardKey = `${CardSuit}-${CardValue}`;
+
+export type CardProps = {
+  suit: CardSuit;
+  value: CardValue;
+};

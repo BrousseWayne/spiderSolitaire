@@ -10,7 +10,6 @@ export default class Deck {
     this.shuffle();
   }
 
-  /** Creates a fresh ordered deck */
   private createDeck(repeatCreateDeck: number): Card[] {
     const suits: CardSuit[] = ["Heart", "Diamond", "Club", "Spade"];
     const values: CardValue[] = [
@@ -41,7 +40,6 @@ export default class Deck {
     return deck;
   }
 
-  /** Classic Fisher-Yates shuffle (optionally takes a custom RNG) */
   shuffle(randomFn: RandomFunction = Math.random): void {
     for (let i = this.deck.length - 1; i > 0; i--) {
       const j = Math.floor(randomFn() * (i + 1));
@@ -49,13 +47,11 @@ export default class Deck {
     }
   }
 
-  /** Shuffle with a specific seed using internal LCG */
   shuffleWithSeed(seed: number): void {
     const seededRandom = this.createSeededRandom(seed);
     this.shuffle(seededRandom);
   }
 
-  /** Linear Congruential Generator for seedable randomness */
   private createSeededRandom(seed: number): RandomFunction {
     let m = 0x80000000; // 2**31
     let a = 1103515245;

@@ -1,38 +1,48 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import "./App.css";
 import { getCardImage } from "./cards";
 import Deck from "./deck";
+import type { CardProps } from "./types";
+import cardBack from "./assets/cards back/tile016.png";
 
-// composition d'un deck
+function Card({ suit, value, title }: CardProps & { title?: string }) {
+  const [flipped, setFlipped] = useState(false);
+  const frontImage = getCardImage(suit, value);
+  const backImage = cardBack;
 
-//52 cartes
-//4 couleurs HCDP
-//1-10
-//J Q K
-
-// spider 2 decks
+  return (
+    <div
+      className={`card ${flipped ? "flipped" : ""}`}
+      onClick={() => setFlipped(!flipped)}
+      title={title}
+    >
+      <div className="card-inner">
+        <div className="card-face card-front">
+          <img src={frontImage} />
+        </div>
+        <div className="card-face card-back">
+          <img src={backImage} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
-  const deck = useMemo(() => new Deck(2), []); // only create deck once
+  const deck = useMemo(() => new Deck(2), []);
 
   const cardsToShow = deck.cards.slice(0, 104);
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       {cardsToShow.map((card, id) => {
-        const src = getCardImage(card.suit, card.value);
         return (
-          <div
+          <Card
             key={id}
-            className="card-container"
+            suit={card.suit}
+            value={card.value}
             title={`${card.value} of ${card.suit}`}
-          >
-            {src ? (
-              <img src={src} alt={`${card.suit} ${card.value}`} />
-            ) : (
-              <div className="noImage">No image</div>
-            )}
-          </div>
+          />
         );
       })}
     </div>
