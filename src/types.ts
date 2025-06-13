@@ -18,6 +18,13 @@ export type Card = {
   suit: CardSuit;
   value: CardValue;
   flipped: boolean;
+  isCovered?: boolean;
+};
+
+export type CardsInGame = Card & {
+  id: string;
+  stackId: number;
+  indexInStack: number;
 };
 
 export type RandomFunction = () => number;

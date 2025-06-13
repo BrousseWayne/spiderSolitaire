@@ -52,6 +52,10 @@ export default class Deck {
     this.shuffle(seededRandom);
   }
 
+  get stockpile(): number {
+    return this.deck.length;
+  }
+
   private createSeededRandom(seed: number): RandomFunction {
     let m = 0x80000000; // 2**31
     let a = 1103515245;

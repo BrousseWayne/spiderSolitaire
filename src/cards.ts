@@ -1,6 +1,5 @@
 import type { CardKey, CardSuit, CardValue } from "./types";
 
-// Import all card images from assets folder eagerly as URLs
 const cardImages: Record<string, string> = import.meta.glob(
   "./assets/high contrast cards/*.png",
   {
@@ -18,14 +17,12 @@ for (const path in cardImages) {
   const fileName = path.split("/").pop();
   if (!fileName) continue;
 
-  // Example fileName: Heart-A.png, Club-10.png
   const [suit, valueWithExt] = fileName.split("-");
   const value = valueWithExt.replace(".png", "");
 
   console.log(`File: ${fileName}, Suit: ${suit}, Value: ${value}`);
 
-  // Validate suits and values (basic check)
-  const validSuits = ["Heart", "Diamond", "Club", "Spade"];
+  const validSuits: CardSuit[] = ["Heart", "Diamond", "Club", "Spade"];
   const validValues = [
     "A",
     "2",
@@ -48,7 +45,6 @@ for (const path in cardImages) {
   }
 }
 
-// Function to get the image URL by suit and value
 export function getCardImage(
   suit: CardSuit,
   value: CardValue
