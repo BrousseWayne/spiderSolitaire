@@ -1,10 +1,9 @@
 import { useRef, useState } from "react";
 import "./App.css";
-import { Logger } from "./utils";
 import { getCardImage } from "./cards";
 import Deck from "./deck";
 import type { CardProps, Card, CardsInGame } from "./types";
-import cardBack from "./assets/cards back/tile016.png";
+import cardBack from "./assets/cards back/tile023.png";
 
 function Card({ suit, value, title, isCovered, onSelect, style }: CardProps) {
   const frontImage = getCardImage(suit, value);
@@ -40,26 +39,16 @@ type SelectedCard = {
 };
 
 interface BoardProps {
-  board: CardsInGame[];
-  onMoveCard: (src: number, dest: number) => void;
+  board: CardsInGame[][];
+  onMoveCard: (src: SelectedCard, dest: SelectedCard) => void;
 }
 
-function isCardCovered(card: CardsInGame, board: CardsInGame[]): boolean {
-  const stack = board.filter((c) => c.stackId === card.stackId);
-  const topCard = stack.reduce(
-    (top, current) => (current.indexInStack > top.indexInStack ? current : top),
-    stack[0]
-  );
-
-  return card.indexInStack !== topCard.indexInStack;
+function isCardCovered(card: CardsInGame, stack: CardsInGame[]): boolean {
+  return card.indexInStack !== stack.length - 1;
 }
 
 function Board({ board, onMoveCard }: BoardProps) {
   const [selectedCard, setSelectedCard] = useState<SelectedCard>();
-
-  const stacks = Array.from({ length: 10 }, (_, i) =>
-    board.filter((card) => card.stackId === i)
-  );
 
   function isMoveLegal(selectedCard, destinationCard) {
     return true;
@@ -67,34 +56,25 @@ function Board({ board, onMoveCard }: BoardProps) {
 
   function moveCard(stackIndex, cardIndex) {
     if (selectedCard) {
-      Logger.debug(
-        "Try to move card to",
-        stackIndex,
-        cardIndex,
-        "already selected card:",
-        selectedCard
-      );
       if (isMoveLegal(selectedCard, { stackIndex, cardIndex })) {
-        // onMoveCard(selectedCard, { stackIndex, cardIndex });
+        onMoveCard(selectedCard, { stackIndex, cardIndex });
         setSelectedCard(undefined);
-        Logger.debug("clear");
       }
     } else {
       setSelectedCard({ stackIndex, cardIndex });
-      Logger.debug("set card");
     }
   }
 
   return (
     <div className="board">
-      {stacks.map((stack, stackIndex) => (
+      {board.map((stack, stackIndex) => (
         <div key={stackIndex} className="stack">
           {stack.map((card, cardIndex) => (
             <Card
               key={card.id}
               suit={card.suit}
               value={card.value}
-              isCovered={isCardCovered(card, board)}
+              isCovered={isCardCovered(card, stack)}
               onSelect={() => moveCard(stackIndex, cardIndex)}
               style={{
                 top: `${card.indexInStack * 30}px`,
@@ -108,19 +88,12 @@ function Board({ board, onMoveCard }: BoardProps) {
   );
 }
 
-//TODO:fix inconsistent hover on cards
-//BUG: stacked cards can be isCovered
-//TODO: how to rotate screen for layout
-// TODO: create a logging function for debug purposes
-
-function createBoard(deck: Deck): CardsInGame[] {
+function createBoard(deck: Deck): CardsInGame[][] {
   const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
 
   for (let i = 0; i < 40; i++) {
     const card = deck.draw(1)[0];
     const stackId = i % 10;
-
-    Logger.debug(card);
 
     stacks[stackId].push({
       ...card,
@@ -154,54 +127,50 @@ function createBoard(deck: Deck): CardsInGame[] {
     });
   }
 
-  Logger.debug(
-    stacks.flat().forEach((e) => {
-      if (e.stackId === 0) Logger.debug(e);
-    })
-  );
-
-  return stacks.flat();
+  return stacks;
 }
 
 function App() {
   const deckRef = useRef<Deck>(new Deck());
-  const [board, setBoard] = useState<CardsInGame[]>(() => {
+  const [board, setBoard] = useState<CardsInGame[][]>(() => {
     const deck = new Deck(2);
     deckRef.current = deck;
     return createBoard(deck);
   });
 
   function flipCard(stackIndex: number, cardIndex: number) {
-    // setBoard((prevBoard) =>
-    // prevBoard.map((stack, si) =>
-    //   si === stackIndex
-    //     ? stack.map((card, ci) =>
-    //         ci === cardIndex ? { ...card, isCovered: !card.isCovered } : card
-    //       )
-    //     : stack
-    // )
-    // );
+    // implement later
   }
 
   function onMoveCard(
     selectedCard: SelectedCard,
     destinationCard: SelectedCard
   ) {
-    Logger.debug("card was moved");
     const { stackIndex: selectedCardStackIndex, cardIndex: selectedCardIndex } =
       selectedCard;
     const { stackIndex: destCardStackIndex, cardIndex: destCardIndex } =
       destinationCard;
 
-    setBoard((prevBoard) => {});
-    // selectedCard, destinationCard;
+    const newBoard = [...board];
 
-    return { stackIndex, cardIndex };
+    const movingCards =
+      newBoard[selectedCardStackIndex].splice(selectedCardIndex);
+
+    newBoard[destCardStackIndex].push(...movingCards);
+
+    newBoard.forEach((stack, si) => {
+      stack.forEach((card, ci) => {
+        card.stackId = si;
+        card.indexInStack = ci;
+      });
+    });
+
+    setBoard(newBoard);
   }
 
   return (
     <div className="container">
-      <Board board={board} flipCard={flipCard} onMoveCard={onMoveCard} />
+      <Board board={board} onMoveCard={onMoveCard} />
     </div>
   );
 }

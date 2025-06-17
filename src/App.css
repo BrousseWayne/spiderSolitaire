@@ -1,5 +1,13 @@
+.card,
+.card-face,
+.card-inner {
+  box-sizing: border-box;
+}
+
 .card {
   width: 90px;
+  /* left: 0; */
+  /* top: 0; */
   height: 120px;
   perspective: 1000px;
   cursor: pointer;
@@ -21,7 +29,6 @@
 
 .card.isCovered {
   pointer-events: none;
-  /* opacity: 0.6; */
 }
 
 .card-face {
@@ -55,18 +62,16 @@
 .card:hover {
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
-  /* z-index: 10; */
 }
 
 .board {
   display: flex;
-  gap: 16px; /* space between stacks */
+  gap: 12px;
   padding: 20px;
 }
 
 .stack {
   position: relative;
   width: 100px;
-  height: 400px; /* enough height to see stacked cards */
-  border: 1px solid transparent; /* optional, for debug */
+  height: 400px;
 }

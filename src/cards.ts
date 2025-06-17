@@ -1,5 +1,4 @@
 import type { CardKey, CardSuit, CardValue } from "./types";
-import { Logger } from "./utils";
 
 const cardImages: Record<string, string> = import.meta.glob(
   "./assets/high contrast cards/*.png",
@@ -12,7 +11,7 @@ const cardImages: Record<string, string> = import.meta.glob(
 
 const cardsMap = new Map<CardKey, string>();
 
-Logger.debug("Loaded cardsMap:", cardsMap);
+// console.log("Loaded cardsMap:", cardsMap);
 
 for (const path in cardImages) {
   const fileName = path.split("/").pop();
@@ -21,7 +20,7 @@ for (const path in cardImages) {
   const [suit, valueWithExt] = fileName.split("-");
   const value = valueWithExt.replace(".png", "");
 
-  Logger.debug("NO", `File: ${fileName}, Suit: ${suit}, Value: ${value}`);
+  // console.log("NO", `File: ${fileName}, Suit: ${suit}, Value: ${value}`);
 
   const validSuits: CardSuit[] = ["Heart", "Diamond", "Club", "Spade"];
   const validValues = [
