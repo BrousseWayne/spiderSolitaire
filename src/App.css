@@ -15,8 +15,13 @@
   transform-style: preserve-3d;
 }
 
-.card.flipped .card-inner {
+.card.isCovered .card-inner {
   transform: rotateY(180deg);
+}
+
+.card.isCovered {
+  pointer-events: none;
+  /* opacity: 0.6; */
 }
 
 .card-face {
@@ -50,7 +55,7 @@
 .card:hover {
   transform: translateY(-6px) scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
-  z-index: 10;
+  /* z-index: 10; */
 }
 
 .board {
@@ -61,19 +66,7 @@
 
 .stack {
   position: relative;
-  width: 100px; /* width of a card or stack */
+  width: 100px;
   height: 400px; /* enough height to see stacked cards */
   border: 1px solid transparent; /* optional, for debug */
-}
-
-.stack .card:nth-child(1) {
-  top: 0px;
-}
-
-.stack .card:nth-child(2) {
-  top: 30px;
-}
-
-.stack .card:nth-child(3) {
-  top: 60px;
 }
