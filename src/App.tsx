@@ -50,6 +50,11 @@ interface BoardProps {
   onMoveCard: (src: SelectedCard, dest: SelectedCard) => void;
 }
 
+//TODO:Not enough need to compute the whole stack must be the same color to be moved
+// TODO:and care about the draw, it could fuck up a stack
+//TODO:implement drag and drop
+//TODO:Must be able to put a King on an empty stack
+//TODO: create a border around the empty stack area
 function isStrictlyBefore(
   selectedCard: SelectedCard,
   destinationCard: SelectedCard
