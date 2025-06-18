@@ -97,7 +97,7 @@ function createBoard(deck: Deck): CardsInGame[][] {
 
     stacks[stackId].push({
       ...card,
-      id: `${card.suit}-${card.value}-${stackId}-${stacks[stackId].length}`,
+      id: `${card.suit}-${card.value}-${Math.random() * 10}`,
       stackId,
       indexInStack: stacks[stackId].length,
     });
@@ -109,7 +109,7 @@ function createBoard(deck: Deck): CardsInGame[][] {
 
     stacks[stackId].push({
       ...card,
-      id: `${card.suit}-${card.value}-${stackId}-${stacks[stackId].length}`,
+      id: `${card.suit}-${card.value}-${Math.random() * 10}`,
       stackId,
       indexInStack: stacks[stackId].length,
     });
@@ -121,7 +121,7 @@ function createBoard(deck: Deck): CardsInGame[][] {
 
     stacks[stackId].push({
       ...card,
-      id: `${card.suit}-${card.value}-${stackId}-${stacks[stackId].length}`,
+      id: `${card.suit}-${card.value}-${Math.random() * 10}`,
       stackId,
       indexInStack: stacks[stackId].length,
     });
@@ -131,11 +131,11 @@ function createBoard(deck: Deck): CardsInGame[][] {
 }
 
 function App() {
-  const deckRef = useRef<Deck>(new Deck());
+  // const deckRef = useRef<Deck>(new Deck());
   const [board, setBoard] = useState<CardsInGame[][]>(() => {
-    const deck = new Deck(2);
-    deckRef.current = deck;
-    return createBoard(deck);
+    // const deck = new Deck(2);
+    // deckRef.current = deck;
+    return createBoard(new Deck(2));
   });
 
   function flipCard(stackIndex: number, cardIndex: number) {
@@ -146,26 +146,23 @@ function App() {
     selectedCard: SelectedCard,
     destinationCard: SelectedCard
   ) {
-    const { stackIndex: selectedCardStackIndex, cardIndex: selectedCardIndex } =
-      selectedCard;
-    const { stackIndex: destCardStackIndex, cardIndex: destCardIndex } =
-      destinationCard;
+    const newBoard = board.map((stack) => [...stack]);
 
-    const newBoard = [...board];
+    const movingCards = newBoard[selectedCard.stackIndex].splice(
+      selectedCard.cardIndex
+    );
 
-    const movingCards =
-      newBoard[selectedCardStackIndex].splice(selectedCardIndex);
+    newBoard[destinationCard.stackIndex].push(...movingCards);
 
-    newBoard[destCardStackIndex].push(...movingCards);
+    const updatedBoard = newBoard.map((stack, si) =>
+      stack.map((card, ci) => ({
+        ...card,
+        stackId: si,
+        indexInStack: ci,
+      }))
+    );
 
-    newBoard.forEach((stack, si) => {
-      stack.forEach((card, ci) => {
-        card.stackId = si;
-        card.indexInStack = ci;
-      });
-    });
-
-    setBoard(newBoard);
+    setBoard(updatedBoard);
   }
 
   return (
