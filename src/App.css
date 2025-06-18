@@ -23,11 +23,11 @@
   transform-style: preserve-3d;
 }
 
-.card.isCovered .card-inner {
+.card.isNotDiscovered .card-inner {
   transform: rotateY(180deg);
 }
 
-.card.isCovered {
+.card.isNotDiscovered {
   pointer-events: none;
 }
 

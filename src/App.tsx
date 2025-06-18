@@ -1,22 +1,29 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import { getCardImage } from "./cards";
 import Deck from "./deck";
 import type { CardProps, Card, CardsInGame } from "./types";
 import cardBack from "./assets/cards back/tile023.png";
 
-function Card({ suit, value, title, isCovered, onSelect, style }: CardProps) {
+function Card({
+  suit,
+  value,
+  title,
+  isDiscovered,
+  onSelect,
+  style,
+}: CardProps) {
   const frontImage = getCardImage(suit, value);
   const backImage = cardBack;
 
   function handleClick() {
-    if (isCovered) return;
+    if (!isDiscovered) return;
     onSelect();
   }
 
   return (
     <div
-      className={`card ${isCovered ? "isCovered" : ""}`}
+      className={`card ${isDiscovered ? "" : "isNotDiscovered"}`}
       onClick={handleClick}
       title={title}
       style={{ position: "absolute", ...style }}
@@ -43,21 +50,74 @@ interface BoardProps {
   onMoveCard: (src: SelectedCard, dest: SelectedCard) => void;
 }
 
-function isCardCovered(card: CardsInGame, stack: CardsInGame[]): boolean {
-  return card.indexInStack !== stack.length - 1;
+function isStrictlyBefore(
+  selectedCard: SelectedCard,
+  destinationCard: SelectedCard
+) {
+  const mapCardValue = new Map<string, number>();
+  mapCardValue.set("A", 1);
+  mapCardValue.set("2", 2);
+  mapCardValue.set("3", 3);
+  mapCardValue.set("4", 4);
+  mapCardValue.set("5", 5);
+  mapCardValue.set("6", 6);
+  mapCardValue.set("7", 7);
+  mapCardValue.set("8", 8);
+  mapCardValue.set("9", 9);
+  mapCardValue.set("10", 10);
+  mapCardValue.set("J", 11);
+  mapCardValue.set("Q", 12);
+  mapCardValue.set("K", 13);
+
+  return selectedCard;
 }
 
 function Board({ board, onMoveCard }: BoardProps) {
   const [selectedCard, setSelectedCard] = useState<SelectedCard>();
 
-  function isMoveLegal(selectedCard, destinationCard) {
-    return true;
+  function isMoveLegal(
+    selectedCard: SelectedCard,
+    destinationCard: SelectedCard
+  ) {
+    function isStrictlyBefore() {
+      const mapCardValue = new Map<string, number>();
+      mapCardValue.set("A", 1);
+      mapCardValue.set("2", 2);
+      mapCardValue.set("3", 3);
+      mapCardValue.set("4", 4);
+      mapCardValue.set("5", 5);
+      mapCardValue.set("6", 6);
+      mapCardValue.set("7", 7);
+      mapCardValue.set("8", 8);
+      mapCardValue.set("9", 9);
+      mapCardValue.set("10", 10);
+      mapCardValue.set("J", 11);
+      mapCardValue.set("Q", 12);
+      mapCardValue.set("K", 13);
+
+      const destValue = mapCardValue.get(
+        board[destinationCard.stackIndex][destinationCard.cardIndex].value
+      );
+      const srcValue = mapCardValue.get(
+        board[selectedCard.stackIndex][selectedCard.cardIndex].value
+      );
+
+      return destValue - srcValue === 1;
+    }
+    //implement rules as a generic function that apply on the array
+
+    console.log(selectedCard, destinationCard);
+    const t = isStrictlyBefore();
+    console.log(t);
+    return t;
   }
 
   function moveCard(stackIndex, cardIndex) {
     if (selectedCard) {
       if (isMoveLegal(selectedCard, { stackIndex, cardIndex })) {
         onMoveCard(selectedCard, { stackIndex, cardIndex });
+        setSelectedCard(undefined);
+      } else {
         setSelectedCard(undefined);
       }
     } else {
@@ -74,7 +134,7 @@ function Board({ board, onMoveCard }: BoardProps) {
               key={card.id}
               suit={card.suit}
               value={card.value}
-              isCovered={isCardCovered(card, stack)}
+              isDiscovered={card.isDiscovered}
               onSelect={() => moveCard(stackIndex, cardIndex)}
               style={{
                 top: `${card.indexInStack * 30}px`,
@@ -124,6 +184,7 @@ function createBoard(deck: Deck): CardsInGame[][] {
       id: `${card.suit}-${card.value}-${Math.random() * 10}`,
       stackId,
       indexInStack: stacks[stackId].length,
+      isDiscovered: true,
     });
   }
 
@@ -137,10 +198,6 @@ function App() {
     // deckRef.current = deck;
     return createBoard(new Deck(2));
   });
-
-  function flipCard(stackIndex: number, cardIndex: number) {
-    // implement later
-  }
 
   function onMoveCard(
     selectedCard: SelectedCard,
@@ -161,6 +218,15 @@ function App() {
         indexInStack: ci,
       }))
     );
+
+    const remainingStack = updatedBoard[selectedCard.stackIndex];
+    if (remainingStack.length > 0) {
+      const topCardIndex = remainingStack.length - 1;
+      remainingStack[topCardIndex] = {
+        ...remainingStack[topCardIndex],
+        isDiscovered: true,
+      };
+    }
 
     setBoard(updatedBoard);
   }

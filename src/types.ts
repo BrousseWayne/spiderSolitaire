@@ -17,7 +17,7 @@ export type CardValue =
 export type Card = {
   suit: CardSuit;
   value: CardValue;
-  flipped: boolean;
+  isDiscovered: boolean;
 };
 
 export type CardsInGame = Card & {
@@ -33,7 +33,7 @@ export type CardKey = `${CardSuit}-${CardValue}`;
 export type CardProps = {
   suit: CardSuit;
   value: CardValue;
-  isCovered: boolean;
+  isDiscovered: boolean;
   onSelect: () => void;
   title?: string;
   style: object;

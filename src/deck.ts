@@ -32,7 +32,7 @@ export default class Deck {
     for (let index = 0; index < repeatCreateDeck; index++) {
       for (const suit of suits) {
         for (const value of values) {
-          deck.push({ suit, value, flipped: true });
+          deck.push({ suit, value, isDiscovered: false });
         }
       }
     }
