@@ -38,3 +38,8 @@ export type CardProps = {
   title?: string;
   style: object;
 };
+
+export type SelectedCard = {
+  stackIndex: number;
+  cardIndex: number;
+};
