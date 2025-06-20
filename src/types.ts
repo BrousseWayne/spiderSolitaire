@@ -35,7 +35,7 @@ export type CardProps = {
   value: CardValue;
   isDiscovered: boolean;
   onSelect: () => void;
-  title?: string;
+  title: string;
   style: object;
 };
 

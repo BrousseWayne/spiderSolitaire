@@ -3,6 +3,7 @@ import type { CardsInGame, SelectedCard } from "./types";
 import Card from "./card";
 import "./App.css";
 import type Deck from "./deck";
+import { Stack } from "./Stack";
 
 interface BoardProps {
   board: CardsInGame[][];
@@ -41,9 +42,7 @@ export function Board({ board, onMoveCard }: BoardProps) {
 
       return destValue - srcValue === 1;
     }
-    //implement rules as a generic function that apply on the array
 
-    console.log(selectedCard, destinationCard);
     const t = isStrictlyBefore();
     console.log(t);
     return t;
@@ -65,21 +64,12 @@ export function Board({ board, onMoveCard }: BoardProps) {
   return (
     <div className="board">
       {board.map((stack, stackIndex) => (
-        <div key={stackIndex} className="stack">
-          {stack.map((card, cardIndex) => (
-            <Card
-              key={card.id}
-              suit={card.suit}
-              value={card.value}
-              isDiscovered={card.isDiscovered}
-              onSelect={() => moveCard(stackIndex, cardIndex)}
-              style={{
-                top: `${card.indexInStack * 30}px`,
-                zIndex: card.indexInStack,
-              }}
-            />
-          ))}
-        </div>
+        <Stack
+          key={stackIndex}
+          stack={stack}
+          stackIndex={stackIndex}
+          moveCard={moveCard}
+        />
       ))}
     </div>
   );

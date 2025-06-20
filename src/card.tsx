@@ -3,6 +3,8 @@ import cardBack from "./assets/cards back/tile023.png";
 import "./App.css";
 
 import type { CardProps } from "./types";
+import { useDraggable } from "@dnd-kit/core";
+import type { CSSProperties } from "react";
 
 export default function Card({
   suit,
@@ -15,17 +17,32 @@ export default function Card({
   const frontImage = getCardImage(suit, value);
   const backImage = cardBack;
 
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: title, // unique id for this card
+  });
+
   function handleClick() {
     if (!isDiscovered) return;
     onSelect();
   }
 
+  const draggableStyle: CSSProperties = {
+    position: "absolute",
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    ...style, // merge additional styles passed as props
+  };
+
   return (
     <div
+      ref={setNodeRef}
       className={`card ${isDiscovered ? "" : "isNotDiscovered"}`}
       onClick={handleClick}
       title={title}
-      style={{ position: "absolute", ...style }}
+      style={draggableStyle}
+      {...listeners}
+      {...attributes}
     >
       <div className="card-inner">
         <div className="card-face card-front">

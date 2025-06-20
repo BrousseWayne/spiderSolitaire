@@ -52,7 +52,27 @@ function App() {
   }
 
   return (
-    <DndContext onDragEnd={(event) => console.log(event)}>
+    <DndContext
+      onDragEnd={({ over, active }) => {
+        if (!over) return;
+
+        const activeId = active.id; // card id (title we passed to useDraggable)
+        const destStackId = over.id; // stack id like "stack-3"
+
+        const [suit, value, stackIndex, cardIndex] = activeId.split("-");
+        const src = {
+          stackIndex: parseInt(stackIndex),
+          cardIndex: parseInt(cardIndex),
+        };
+
+        const destStackIndex = parseInt(destStackId.replace("stack-", ""));
+
+        onMoveCard(src, {
+          stackIndex: destStackIndex,
+          cardIndex: board[destStackIndex].length, // put it on top
+        });
+      }}
+    >
       <div className="container">
         <Board board={board} onMoveCard={onMoveCard} />
       </div>
