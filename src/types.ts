@@ -26,6 +26,11 @@ export type CardsInGame = Card & {
   indexInStack: number;
 };
 
+export type BoardType = {
+  board: CardsInGame[][];
+  draw: CardsInGame[][];
+};
+
 export type RandomFunction = () => number;
 
 export type CardKey = `${CardSuit}-${CardValue}`;
@@ -34,7 +39,6 @@ export type CardProps = {
   suit: CardSuit;
   value: CardValue;
   isDiscovered: boolean;
-  onSelect: () => void;
   title: string;
   style: object;
 };

@@ -1,36 +1,105 @@
 import { useState } from "react";
 import "./App.css";
 import Deck from "./deck";
-import type { CardsInGame, SelectedCard } from "./types";
+import type { BoardType, Card, CardsInGame, SelectedCard } from "./types";
 import { DndContext } from "@dnd-kit/core";
-import { Board, createBoard } from "./board";
+import { Board, Draw } from "./board";
+
+function createBoard(deck: Deck): BoardType {
+  const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
+  const draw: CardsInGame[][] = Array.from({ length: 5 }, () => []);
+
+  const assignedId = new Map<string, number>();
+
+  function createIdString(card: Card) {
+    return `${card.suit}-${card.value}`;
+  }
+
+  function assignId(card: Card) {
+    const partialId = createIdString(card);
+    if (assignedId.get(partialId) === 0) {
+      return `${partialId}-1`;
+    } else {
+      assignedId.set(partialId, 0);
+      return `${partialId}-0`;
+    }
+  }
+
+  function drawCards(
+    cardsToDraw: number,
+    storage: CardsInGame[][],
+    isDiscovered: boolean,
+    stacks: number
+  ) {
+    for (let i = 0; i < cardsToDraw; i++) {
+      const card = deck.draw(1)[0];
+      const stackId = i % stacks;
+
+      storage[stackId].push({
+        ...card,
+        id: assignId(card),
+        stackId,
+        indexInStack: storage[stackId].length,
+        isDiscovered,
+      });
+    }
+  }
+
+  drawCards(40, stacks, false, 10);
+  drawCards(4, stacks, false, 10);
+  drawCards(10, stacks, true, 10);
+  drawCards(deck.cards.length, draw, false, 5);
+
+  return { board: stacks, draw: draw };
+}
 
 //TODO:Not enough need to compute the whole stack must be the same color to be moved
 // TODO:and care about the draw, it could fuck up a stack
 //TODO:implement drag and drop
-//TODO:Must be able to put a King on an empty stack
 //TODO: create a border around the empty stack area
 
 function App() {
-  // const deckRef = useRef<Deck>(new Deck());
-  const [board, setBoard] = useState<CardsInGame[][]>(() => {
-    // const deck = new Deck(2);
-    // deckRef.current = deck;
-    return createBoard(new Deck(2));
-  });
+  const [board, setBoard] = useState<BoardType>(() => createBoard(new Deck(2)));
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  function onMoveCard(
-    selectedCard: SelectedCard,
-    destinationCard: SelectedCard
-  ) {
-    const newBoard = board.map((stack) => [...stack]);
+  function isMoveLegal(src: SelectedCard, dest: SelectedCard) {
+    const mapCardValue = new Map<string, number>([
+      ["A", 1],
+      ["2", 2],
+      ["3", 3],
+      ["4", 4],
+      ["5", 5],
+      ["6", 6],
+      ["7", 7],
+      ["8", 8],
+      ["9", 9],
+      ["10", 10],
+      ["J", 11],
+      ["Q", 12],
+      ["K", 13],
+    ]);
 
-    const movingCards = newBoard[selectedCard.stackIndex].splice(
-      selectedCard.cardIndex
-    );
+    const srcCard = board.board[src.stackIndex][src.cardIndex];
+    const destStack = board.board[dest.stackIndex];
+    const destCard = destStack[dest.cardIndex - 1];
 
-    newBoard[destinationCard.stackIndex].push(...movingCards);
+    if (destStack.length === 0) return true;
 
+    if (!destCard) return false;
+
+    const srcValue = mapCardValue.get(srcCard.value);
+    const destValue = mapCardValue.get(destCard.value);
+
+    return destValue - srcValue === 1;
+  }
+
+  function moveCard(src: SelectedCard, dest: SelectedCard) {
+    const newBoard = board.board.map((stack) => [...stack]);
+
+    const movingCards = newBoard[src.stackIndex].splice(src.cardIndex);
+    newBoard[dest.stackIndex].push(...movingCards);
+
+    // Update indexes & stack IDs
     const updatedBoard = newBoard.map((stack, si) =>
       stack.map((card, ci) => ({
         ...card,
@@ -39,7 +108,8 @@ function App() {
       }))
     );
 
-    const remainingStack = updatedBoard[selectedCard.stackIndex];
+    // Discover new top card on src stack
+    const remainingStack = updatedBoard[src.stackIndex];
     if (remainingStack.length > 0) {
       const topCardIndex = remainingStack.length - 1;
       remainingStack[topCardIndex] = {
@@ -48,33 +118,40 @@ function App() {
       };
     }
 
-    setBoard(updatedBoard);
+    setBoard({ board: updatedBoard, draw: board.draw });
   }
 
   return (
     <DndContext
+      onDragStart={({ active }) => setActiveId(active.id)}
       onDragEnd={({ over, active }) => {
         if (!over) return;
 
-        const activeId = active.id; // card id (title we passed to useDraggable)
-        const destStackId = over.id; // stack id like "stack-3"
+        console.log(active);
 
-        const [suit, value, stackIndex, cardIndex] = activeId.split("-");
+        const activeId = active.id;
+        const destStackId = over.id;
+
+        const [_, __, stackIndex, cardIndex] = activeId.split("-");
         const src = {
           stackIndex: parseInt(stackIndex),
           cardIndex: parseInt(cardIndex),
         };
 
         const destStackIndex = parseInt(destStackId.replace("stack-", ""));
-
-        onMoveCard(src, {
+        const dest = {
           stackIndex: destStackIndex,
-          cardIndex: board[destStackIndex].length, // put it on top
-        });
+          cardIndex: board.board[destStackIndex].length,
+        };
+
+        if (!isMoveLegal(src, dest)) return;
+
+        moveCard(src, dest);
       }}
     >
       <div className="container">
-        <Board board={board} onMoveCard={onMoveCard} />
+        <Draw board={board.draw} activeId={""} />
+        <Board board={board.board} activeId={""} />
       </div>
     </DndContext>
   );

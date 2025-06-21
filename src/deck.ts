@@ -3,11 +3,15 @@ import type { Card, CardSuit, CardValue, RandomFunction } from "./types";
 export default class Deck {
   private deck: Card[];
   private repeatCreate: number;
+  private savedDeck: string;
 
   constructor(repeatCreateDeck = 2) {
     this.repeatCreate = repeatCreateDeck;
     this.deck = this.createDeck(repeatCreateDeck);
     this.shuffle();
+
+    this.savedDeck = this.toJSON();
+    console.log(this.savedDeck);
   }
 
   private createDeck(repeatCreateDeck: number): Card[] {
@@ -69,7 +73,7 @@ export default class Deck {
   }
 
   reset(): void {
-    this.deck = this.createDeck(this.repeatCreate);
+    this.fromJSON(this.savedDeck);
   }
 
   get cards(): Card[] {
@@ -81,5 +85,13 @@ export default class Deck {
       throw new Error("Not enough cards in the deck.");
     }
     return this.deck.splice(0, count);
+  }
+
+  toJSON(): string {
+    return JSON.stringify(this.deck);
+  }
+
+  fromJSON(json: string): void {
+    this.deck = JSON.parse(json);
   }
 }
