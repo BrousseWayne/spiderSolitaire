@@ -63,7 +63,7 @@
 }
 
 .board {
-  /* margin-top: 20%; */
+  margin-top: 15%;
   display: flex;
   gap: 12px;
   padding: 20px;
@@ -71,8 +71,10 @@
 
 .draw {
   display: flex;
-  /* gap: 1px; */
+  gap: 12px;
   padding: 20px;
+  position: relative;
+  left: 24.5px;
 }
 
 .stack {

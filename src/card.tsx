@@ -16,16 +16,18 @@ export default function Card({
   const frontImage = getCardImage(suit, value);
   const backImage = cardBack;
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: title,
-    disabled: !isDiscovered, // disable drag if not discovered
-  });
+  const { attributes, listeners, setNodeRef, isDragging, transform } =
+    useDraggable({
+      id: title,
+      disabled: !isDiscovered, // disable drag if not discovered
+    });
 
   const draggableStyle: CSSProperties = {
     position: "absolute",
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
+    zIndex: 999,
     ...style,
   };
 
@@ -41,6 +43,23 @@ export default function Card({
       <div className="card-inner">
         <div className="card-face card-front">
           <img src={frontImage} />
+        </div>
+        <div className="card-face card-back">
+          <img src={backImage} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function BackCard({ onClick, style }) {
+  const backImage = cardBack;
+
+  return (
+    <div className={`card `} onClick={onClick} style={style}>
+      <div className="card-inner">
+        <div className="card-face card-front">
+          <img src={backImage} />
         </div>
         <div className="card-face card-back">
           <img src={backImage} />

@@ -150,7 +150,7 @@ function App() {
       }}
     >
       <div className="container">
-        <Draw board={board.draw} activeId={""} />
+        <Draw draw={board.draw} />
         <Board board={board.board} activeId={""} />
       </div>
     </DndContext>

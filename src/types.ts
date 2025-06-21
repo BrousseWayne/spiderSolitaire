@@ -14,13 +14,13 @@ export type CardValue =
   | "Q"
   | "K";
 
-export type Card = {
+export type CardType = {
   suit: CardSuit;
   value: CardValue;
   isDiscovered: boolean;
 };
 
-export type CardsInGame = Card & {
+export type CardsInGame = CardType & {
   id: string;
   stackId: number;
   indexInStack: number;

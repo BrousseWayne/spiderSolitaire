@@ -1,12 +1,11 @@
 import { useDroppable } from "@dnd-kit/core";
-import Card from "./card";
+import Card, { BackCard } from "./card";
 import type { CardsInGame } from "./types";
 
 interface StackProps {
   stack: CardsInGame[];
   stackIndex: number;
 }
-
 export function Stack({ stack, stackIndex }: StackProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `stack-${stackIndex}`,
@@ -17,6 +16,8 @@ export function Stack({ stack, stackIndex }: StackProps) {
       ref={setNodeRef}
       className="stack"
       style={{
+        position: "relative",
+        minHeight: "150px",
         border: isOver ? "2px dashed green" : "1px solid transparent",
         borderRadius: "8px",
         padding: "4px",
@@ -25,7 +26,7 @@ export function Stack({ stack, stackIndex }: StackProps) {
       {stack.map((card) => (
         <Card
           key={card.id}
-          title={`${card.suit}-${card.value}-${stackIndex}-${card.indexInStack}`}
+          title={card.id}
           suit={card.suit}
           value={card.value}
           isDiscovered={card.isDiscovered}
@@ -44,6 +45,10 @@ interface BoardProps {
   activeId: string;
 }
 
+interface DrawPileProps {
+  draw: CardsInGame[][];
+}
+
 export function Board({ board }: BoardProps) {
   return (
     <div className="board">
@@ -54,11 +59,14 @@ export function Board({ board }: BoardProps) {
   );
 }
 
-export function Draw({ board }: BoardProps) {
+export function Draw({ draw }: DrawPileProps) {
   return (
     <div className="draw">
-      {board.map((stack, stackIndex) => (
-        <Stack key={stackIndex} stack={stack} stackIndex={stackIndex} />
+      {draw.map((stack, stackIndex) => (
+        <BackCard
+          style={{ left: `${stackIndex * 30}px` }}
+          onClick={() => console.log("clicked")}
+        />
       ))}
     </div>
   );
