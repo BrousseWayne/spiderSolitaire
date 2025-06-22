@@ -80,6 +80,7 @@ function App() {
     ]);
 
     const srcCard = board.board[src.stackIndex][src.cardIndex];
+    console.log(board.board[src.stackIndex], src.stackIndex);
     const destStack = board.board[dest.stackIndex];
     const destCard = destStack[dest.cardIndex - 1];
 
@@ -128,6 +129,7 @@ function App() {
         if (!over) return;
 
         console.log(active);
+        console.log("Active ID:", active.id);
 
         const activeId = active.id;
         const destStackId = over.id;
@@ -138,13 +140,15 @@ function App() {
           cardIndex: parseInt(cardIndex),
         };
 
+        console.log(src.cardIndex, src.stackIndex);
+
         const destStackIndex = parseInt(destStackId.replace("stack-", ""));
         const dest = {
           stackIndex: destStackIndex,
           cardIndex: board.board[destStackIndex].length,
         };
 
-        if (!isMoveLegal(src, dest)) return;
+        // if (!isMoveLegal(src, dest)) return;
 
         moveCard(src, dest);
       }}

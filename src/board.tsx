@@ -66,6 +66,7 @@ export function Draw({ draw }: DrawPileProps) {
         <BackCard
           style={{ left: `${stackIndex * 30}px` }}
           onClick={() => console.log("clicked")}
+          key={stackIndex}
         />
       ))}
     </div>
