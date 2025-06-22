@@ -26,7 +26,7 @@ export function Stack({ stack, stackIndex }: StackProps) {
       {stack.map((card) => (
         <Card
           key={card.id}
-          title={card.id}
+          title={`${card.suit}-${card.value}-${stackIndex}-${card.indexInStack}`}
           suit={card.suit}
           value={card.value}
           isDiscovered={card.isDiscovered}
