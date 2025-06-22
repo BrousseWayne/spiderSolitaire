@@ -11,23 +11,25 @@ export default function Card({
   value,
   title,
   isDiscovered,
+  activeId,
   style,
 }: CardProps) {
   const frontImage = getCardImage(suit, value);
   const backImage = cardBack;
 
-  const { attributes, listeners, setNodeRef, isDragging, transform } =
-    useDraggable({
-      id: title,
-      disabled: !isDiscovered, // disable drag if not discovered
-    });
+  const isActive = title === activeId;
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: title,
+    disabled: !isDiscovered,
+  });
 
   const draggableStyle: CSSProperties = {
     position: "absolute",
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
-    zIndex: 999,
+    zIndex: isActive ? 999 : style.zIndex,
     ...style,
   };
 

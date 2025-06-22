@@ -50,7 +50,7 @@ function createBoard(deck: Deck): BoardType {
   drawCards(10, stacks, true, 10);
   drawCards(deck.cards.length, draw, false, 5);
 
-  return { board: stacks, draw: draw };
+  return { cards: stacks, draw: draw };
 }
 
 //TODO:Not enough need to compute the whole stack must be the same color to be moved
@@ -79,9 +79,16 @@ function App() {
       ["K", 13],
     ]);
 
-    const srcCard = board.board[src.stackIndex][src.cardIndex];
-    console.log(board.board[src.stackIndex], src.stackIndex);
-    const destStack = board.board[dest.stackIndex];
+    const srcCard = board.cards[src.stackIndex][src.cardIndex];
+    for (
+      let index = src.cardIndex;
+      index < board.cards[src.stackIndex].length;
+      index++
+    ) {
+      if (board.cards[src.stackIndex][index].suit !== srcCard.suit) return;
+    }
+
+    const destStack = board.cards[dest.stackIndex];
     const destCard = destStack[dest.cardIndex - 1];
 
     if (destStack.length === 0) return true;
@@ -95,7 +102,7 @@ function App() {
   }
 
   function moveCard(src: SelectedCard, dest: SelectedCard) {
-    const newBoard = board.board.map((stack) => [...stack]);
+    const newBoard = board.cards.map((stack) => [...stack]);
 
     const movingCards = newBoard[src.stackIndex].splice(src.cardIndex);
     newBoard[dest.stackIndex].push(...movingCards);
@@ -119,7 +126,7 @@ function App() {
       };
     }
 
-    setBoard({ board: updatedBoard, draw: board.draw });
+    setBoard({ cards: updatedBoard, draw: board.draw });
   }
 
   return (
@@ -140,22 +147,20 @@ function App() {
           cardIndex: parseInt(cardIndex),
         };
 
-        console.log(src.cardIndex, src.stackIndex);
-
         const destStackIndex = parseInt(destStackId.replace("stack-", ""));
         const dest = {
           stackIndex: destStackIndex,
-          cardIndex: board.board[destStackIndex].length,
+          cardIndex: board.cards[destStackIndex].length,
         };
 
-        // if (!isMoveLegal(src, dest)) return;
+        if (!isMoveLegal(src, dest)) return;
 
         moveCard(src, dest);
       }}
     >
       <div className="container">
         <Draw draw={board.draw} />
-        <Board board={board.board} activeId={""} />
+        <Board board={board.cards} activeId={activeId ?? ""} />
       </div>
     </DndContext>
   );

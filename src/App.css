@@ -65,7 +65,6 @@
 .board {
   margin-top: 15%;
   display: flex;
-  gap: 12px;
   padding: 20px;
 }
 

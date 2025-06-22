@@ -1,3 +1,6 @@
+import type { UniqueIdentifier } from "@dnd-kit/core";
+import type { CSSProperties } from "react";
+
 export type CardSuit = "Heart" | "Diamond" | "Club" | "Spade";
 export type CardValue =
   | "A"
@@ -27,7 +30,7 @@ export type CardsInGame = CardType & {
 };
 
 export type BoardType = {
-  board: CardsInGame[][];
+  cards: CardsInGame[][];
   draw: CardsInGame[][];
 };
 
@@ -40,7 +43,8 @@ export type CardProps = {
   value: CardValue;
   isDiscovered: boolean;
   title: string;
-  style: object;
+  style: CSSProperties;
+  activeId: UniqueIdentifier;
 };
 
 export type SelectedCard = {
