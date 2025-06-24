@@ -8,8 +8,12 @@ interface StackProps {
   activeId: UniqueIdentifier;
 }
 
+interface FoundationProps {
+  id: number;
+}
+
 export function Stack({ stack, stackIndex, activeId }: StackProps) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: `stack-${stackIndex}`,
   });
 
@@ -32,7 +36,7 @@ export function Stack({ stack, stackIndex, activeId }: StackProps) {
   );
 }
 
-export function Foundation({ id }) {
+export function Foundation({ id }: FoundationProps) {
   return (
     <div className="emptyStack">
       <div className="card-inner card-empty" key={id}>

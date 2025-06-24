@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import Deck from "./deck";
 import type { BoardType, CardType, CardsInGame, SelectedCard } from "./types";
-import { DndContext } from "@dnd-kit/core";
+import { DndContext, type UniqueIdentifier } from "@dnd-kit/core";
 import { Board, Draw, Foundation } from "./board";
 
 function createBoard(deck: Deck): BoardType {
@@ -55,7 +55,7 @@ function createBoard(deck: Deck): BoardType {
 
 function App() {
   const [board, setBoard] = useState<BoardType>(() => createBoard(new Deck(2)));
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<UniqueIdentifier>();
 
   function isMoveLegal(src: SelectedCard, dest: SelectedCard) {
     const mapCardValue = new Map<string, number>([
@@ -128,7 +128,6 @@ function App() {
 
     const newBoard = board.cards.map((stack) => [...stack]);
 
-    setMovingCards(drawedCards);
     drawedCards.forEach((element, index) => {
       newBoard[index].push({
         ...element,
