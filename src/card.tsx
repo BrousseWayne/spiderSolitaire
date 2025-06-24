@@ -30,7 +30,7 @@ export default function Card({
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
-    zIndex: isActive ? 999 : style.zIndex,
+    zIndex: isActive ? 999 : "auto",
     ...style,
   };
 

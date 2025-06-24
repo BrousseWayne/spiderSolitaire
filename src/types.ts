@@ -51,3 +51,9 @@ export type SelectedCard = {
   stackIndex: number;
   cardIndex: number;
 };
+
+export type GameAction =
+  | { type: "MOVE_CARD"; src: SelectedCard; dest: SelectedCard }
+  | { type: "DRAW_FROM_PILE" };
+
+export type GameState = BoardType; // We'll expand this later

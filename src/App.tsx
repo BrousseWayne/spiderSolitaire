@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import "./App.css";
 import Deck from "./deck";
 import type { BoardType, CardType, CardsInGame, SelectedCard } from "./types";
-import { DndContext, type UniqueIdentifier } from "@dnd-kit/core";
+import {
+  DndContext,
+  type DragEndEvent,
+  type DragStartEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
 import { Board, Draw, Foundation } from "./board";
+import { gameReducer } from "./gameReducer";
 
 function createBoard(deck: Deck): BoardType {
   const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
@@ -54,132 +60,58 @@ function createBoard(deck: Deck): BoardType {
 }
 
 function App() {
-  const [board, setBoard] = useState<BoardType>(() => createBoard(new Deck(2)));
+  const [state, dispatch] = useReducer(gameReducer, null, () =>
+    createBoard(new Deck(2))
+  );
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
+  const [movingCards, setMovingCards] = useState<CardsInGame[]>([]);
 
-  function isMoveLegal(src: SelectedCard, dest: SelectedCard) {
-    const mapCardValue = new Map<string, number>([
-      ["A", 1],
-      ["2", 2],
-      ["3", 3],
-      ["4", 4],
-      ["5", 5],
-      ["6", 6],
-      ["7", 7],
-      ["8", 8],
-      ["9", 9],
-      ["10", 10],
-      ["J", 11],
-      ["Q", 12],
-      ["K", 13],
-    ]);
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    const [_, __, stackIndex, cardIndex] = active.id.split("-");
+    const stack = state.cards[parseInt(stackIndex)];
+    setMovingCards(stack.slice(parseInt(cardIndex)));
+    setActiveId(active.id);
+  };
 
-    const srcCard = board.cards[src.stackIndex][src.cardIndex];
-    for (
-      let index = src.cardIndex;
-      index < board.cards[src.stackIndex].length;
-      index++
-    ) {
-      if (board.cards[src.stackIndex][index].suit !== srcCard.suit) return;
+  const handleDragEnd = ({ over }: DragEndEvent) => {
+    if (!over || !activeId) {
+      setMovingCards([]);
+      return;
     }
 
-    const destStack = board.cards[dest.stackIndex];
-    const destCard = destStack[dest.cardIndex - 1];
+    const [_, __, stackIndex, cardIndex] = activeId.split("-");
+    const src = {
+      stackIndex: parseInt(stackIndex),
+      cardIndex: parseInt(cardIndex),
+    };
 
-    if (destStack.length === 0) return true;
+    const destStackIndex = parseInt(over.id.replace("stack-", ""));
+    const dest = {
+      stackIndex: destStackIndex,
+      cardIndex: state.cards[destStackIndex].length,
+    };
 
-    if (!destCard) return false;
-
-    const srcValue = mapCardValue.get(srcCard.value);
-    const destValue = mapCardValue.get(destCard.value);
-
-    return destValue - srcValue === 1;
-  }
-
-  function moveCard(src: SelectedCard, dest: SelectedCard) {
-    const newBoard = board.cards.map((stack) => [...stack]);
-
-    const movingCards = newBoard[src.stackIndex].splice(src.cardIndex);
-    newBoard[dest.stackIndex].push(...movingCards);
-
-    const updatedBoard = newBoard.map((stack, si) =>
-      stack.map((card, ci) => ({
-        ...card,
-        stackId: si,
-        indexInStack: ci,
-      }))
-    );
-
-    const remainingStack = updatedBoard[src.stackIndex];
-    if (remainingStack.length > 0) {
-      const topCardIndex = remainingStack.length - 1;
-      remainingStack[topCardIndex] = {
-        ...remainingStack[topCardIndex],
-        isDiscovered: true,
-      };
-    }
-
-    setBoard({ cards: updatedBoard, draw: board.draw });
-  }
-
-  function drawFromPile() {
-    const drawedCards = board.draw.pop();
-    if (!drawedCards) return;
-
-    const newBoard = board.cards.map((stack) => [...stack]);
-
-    drawedCards.forEach((element, index) => {
-      newBoard[index].push({
-        ...element,
-        isDiscovered: true,
-        indexInStack: newBoard[index].length,
-      });
-    });
-
-    setBoard({ cards: newBoard, draw: board.draw });
-  }
+    dispatch({ type: "MOVE_CARD", src, dest });
+    setMovingCards([]);
+  };
 
   const array = [1, 2, 3, 4, 5, 6, 7, 8];
 
   return (
-    <DndContext
-      onDragStart={({ active }) => setActiveId(active.id)}
-      onDragEnd={({ over, active }) => {
-        if (!over) return;
-
-        console.log(active);
-        console.log("Active ID:", active.id);
-
-        const activeId = active.id;
-        const destStackId = over.id;
-
-        const [_, __, stackIndex, cardIndex] = activeId.split("-");
-        const src = {
-          stackIndex: parseInt(stackIndex),
-          cardIndex: parseInt(cardIndex),
-        };
-
-        const destStackIndex = parseInt(destStackId.replace("stack-", ""));
-        const dest = {
-          stackIndex: destStackIndex,
-          cardIndex: board.cards[destStackIndex].length,
-        };
-
-        if (!isMoveLegal(src, dest)) return;
-
-        moveCard(src, dest);
-      }}
-    >
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="container">
         <div className="top-bar">
-          <Draw draw={board.draw} onClick={drawFromPile} />
+          <Draw
+            draw={state.draw}
+            onClick={() => dispatch({ type: "DRAW_FROM_PILE" })}
+          />
           <div className="win-stacks">
             {array.map((array, arrayIndex) => (
               <Foundation key={arrayIndex} id={arrayIndex} />
             ))}
           </div>
         </div>
-        <Board board={board.cards} activeId={activeId ?? ""} />
+        <Board board={state.cards} activeId={activeId ?? ""} />
       </div>
     </DndContext>
   );
