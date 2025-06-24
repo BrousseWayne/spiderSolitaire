@@ -11,16 +11,12 @@ const cardImages: Record<string, string> = import.meta.glob(
 
 const cardsMap = new Map<CardKey, string>();
 
-// console.log("Loaded cardsMap:", cardsMap);
-
 for (const path in cardImages) {
   const fileName = path.split("/").pop();
   if (!fileName) continue;
 
   const [suit, valueWithExt] = fileName.split("-");
   const value = valueWithExt.replace(".png", "");
-
-  // console.log("NO", `File: ${fileName}, Suit: ${suit}, Value: ${value}`);
 
   const validSuits: CardSuit[] = ["Heart", "Diamond", "Club", "Spade"];
   const validValues = [

@@ -12,7 +12,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
   }
 }
 
-// Pure function version of your existing move logic
 function moveCards(
   state: GameState,
   src: SelectedCard,
@@ -27,12 +26,11 @@ function moveCards(
   const updatedMovingCards = movingCards.map((card, i) => ({
     ...card,
     stackId: dest.stackIndex,
-    indexInStack: destStackLength + i, // Correct position in new stack
+    indexInStack: destStackLength + i,
   }));
 
   newCards[dest.stackIndex].push(...updatedMovingCards);
 
-  // Reveal next card if available
   const sourceStack = newCards[src.stackIndex];
   if (sourceStack.length > 0) {
     const lastIndex = sourceStack.length - 1;
@@ -42,7 +40,6 @@ function moveCards(
   return { ...state, cards: newCards };
 }
 
-// Pure version of draw logic
 function drawFromPile(state: GameState): GameState {
   if (state.draw.length === 0) return state;
 
@@ -61,7 +58,6 @@ function drawFromPile(state: GameState): GameState {
   return { cards: newCards, draw: newDraw };
 }
 
-// Extracted validation logic
 function isMoveValid(
   state: GameState,
   src: SelectedCard,
@@ -70,7 +66,6 @@ function isMoveValid(
   const srcStack = state.cards[src.stackIndex];
   const movingCards = srcStack.slice(src.cardIndex);
 
-  // All moving cards must be same suit and in sequence
   const firstSuit = movingCards[0].suit;
   const isSequenceValid = movingCards.every((card, i) => {
     if (i === 0) return true;
@@ -81,9 +76,8 @@ function isMoveValid(
 
   if (!isSequenceValid) return false;
 
-  // Destination validation
   const destStack = state.cards[dest.stackIndex];
-  if (destStack.length === 0) return true; // Can place on empty stack
+  if (destStack.length === 0) return true;
 
   const topDestCard = destStack[destStack.length - 1];
   return (

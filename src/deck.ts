@@ -61,7 +61,7 @@ export default class Deck {
   }
 
   private createSeededRandom(seed: number): RandomFunction {
-    let m = 0x80000000; // 2**31
+    let m = 0x80000000;
     let a = 1103515245;
     let c = 12345;
     let state = seed;
