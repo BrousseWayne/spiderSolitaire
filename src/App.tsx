@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "./App.css";
 import Deck from "./deck";
-import type { BoardType, Card, CardsInGame, SelectedCard } from "./types";
+import type { BoardType, CardType, CardsInGame, SelectedCard } from "./types";
 import { DndContext } from "@dnd-kit/core";
-import { Board, Draw } from "./board";
+import { Board, Draw, Foundation } from "./board";
 
 function createBoard(deck: Deck): BoardType {
   const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
@@ -11,11 +11,11 @@ function createBoard(deck: Deck): BoardType {
 
   const assignedId = new Map<string, number>();
 
-  function createIdString(card: Card) {
+  function createIdString(card: CardType) {
     return `${card.suit}-${card.value}`;
   }
 
-  function assignId(card: Card) {
+  function assignId(card: CardType) {
     const partialId = createIdString(card);
     if (assignedId.get(partialId) === 0) {
       return `${partialId}-1`;
@@ -52,11 +52,6 @@ function createBoard(deck: Deck): BoardType {
 
   return { cards: stacks, draw: draw };
 }
-
-//TODO:Not enough need to compute the whole stack must be the same color to be moved
-// TODO:and care about the draw, it could fuck up a stack
-//TODO:implement drag and drop
-//TODO: create a border around the empty stack area
 
 function App() {
   const [board, setBoard] = useState<BoardType>(() => createBoard(new Deck(2)));
@@ -107,7 +102,6 @@ function App() {
     const movingCards = newBoard[src.stackIndex].splice(src.cardIndex);
     newBoard[dest.stackIndex].push(...movingCards);
 
-    // Update indexes & stack IDs
     const updatedBoard = newBoard.map((stack, si) =>
       stack.map((card, ci) => ({
         ...card,
@@ -116,7 +110,6 @@ function App() {
       }))
     );
 
-    // Discover new top card on src stack
     const remainingStack = updatedBoard[src.stackIndex];
     if (remainingStack.length > 0) {
       const topCardIndex = remainingStack.length - 1;
@@ -128,6 +121,26 @@ function App() {
 
     setBoard({ cards: updatedBoard, draw: board.draw });
   }
+
+  function drawFromPile() {
+    const drawedCards = board.draw.pop();
+    if (!drawedCards) return;
+
+    const newBoard = board.cards.map((stack) => [...stack]);
+
+    setMovingCards(drawedCards);
+    drawedCards.forEach((element, index) => {
+      newBoard[index].push({
+        ...element,
+        isDiscovered: true,
+        indexInStack: newBoard[index].length,
+      });
+    });
+
+    setBoard({ cards: newBoard, draw: board.draw });
+  }
+
+  const array = [1, 2, 3, 4, 5, 6, 7, 8];
 
   return (
     <DndContext
@@ -159,7 +172,14 @@ function App() {
       }}
     >
       <div className="container">
-        <Draw draw={board.draw} />
+        <div className="top-bar">
+          <Draw draw={board.draw} onClick={drawFromPile} />
+          <div className="win-stacks">
+            {array.map((array, arrayIndex) => (
+              <Foundation key={arrayIndex} id={arrayIndex} />
+            ))}
+          </div>
+        </div>
         <Board board={board.cards} activeId={activeId ?? ""} />
       </div>
     </DndContext>

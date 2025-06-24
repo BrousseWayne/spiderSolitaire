@@ -14,16 +14,7 @@ export function Stack({ stack, stackIndex, activeId }: StackProps) {
   });
 
   return (
-    <div
-      ref={setNodeRef}
-      className="stack"
-      style={{
-        position: "relative",
-        minHeight: "150px",
-        border: isOver ? "2px dashed green" : "1px solid transparent",
-        borderRadius: "8px",
-      }}
-    >
+    <div ref={setNodeRef} className="stack">
       {stack.map((card) => (
         <Card
           key={card.id}
@@ -41,6 +32,16 @@ export function Stack({ stack, stackIndex, activeId }: StackProps) {
   );
 }
 
+export function Foundation({ id }) {
+  return (
+    <div className="emptyStack">
+      <div className="card-inner card-empty" key={id}>
+        {id}
+      </div>
+    </div>
+  );
+}
+
 interface BoardProps {
   board: CardsInGame[][];
   activeId: UniqueIdentifier;
@@ -48,6 +49,7 @@ interface BoardProps {
 
 interface DrawPileProps {
   draw: CardsInGame[][];
+  onClick: () => void;
 }
 
 export function Board({ board, activeId }: BoardProps) {
@@ -65,15 +67,11 @@ export function Board({ board, activeId }: BoardProps) {
   );
 }
 
-export function Draw({ draw }: DrawPileProps) {
+export function Draw({ draw, onClick }: DrawPileProps) {
   return (
-    <div className="draw">
+    <div className="draw" onClick={onClick}>
       {draw.map((stack, stackIndex) => (
-        <BackCard
-          style={{ left: `${stackIndex * 30}px` }}
-          onClick={() => console.log("clicked")}
-          key={stackIndex}
-        />
+        <BackCard style={{ left: `${stackIndex * 20}px` }} key={stackIndex} />
       ))}
     </div>
   );

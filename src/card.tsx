@@ -5,6 +5,7 @@ import "./App.css";
 import type { CardProps } from "./types";
 import { useDraggable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
+import { motion } from "motion/react";
 
 export default function Card({
   suit,
@@ -43,7 +44,7 @@ export default function Card({
       {...attributes}
     >
       <div className="card-inner">
-        <div className="card-face card-front">
+        <div className="card-face ">
           <img src={frontImage} />
         </div>
         <div className="card-face card-back">
@@ -54,11 +55,11 @@ export default function Card({
   );
 }
 
-export function BackCard({ onClick, style }) {
+export function BackCard({ style }) {
   const backImage = cardBack;
 
   return (
-    <div className={`card `} onClick={onClick} style={style}>
+    <div className={`card `} style={style}>
       <div className="card-inner">
         <div className="card-face card-front">
           <img src={backImage} />
