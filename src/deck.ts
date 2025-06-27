@@ -1,21 +1,29 @@
-import type { Card, CardSuit, CardValue, RandomFunction } from "./types";
+import type {
+  CardType,
+  CardSuit,
+  CardValue,
+  RandomFunction,
+  FormatType,
+} from "./types";
 
 export default class Deck {
-  private deck: Card[];
+  private deck: CardType[];
   private repeatCreate: number;
   private savedDeck: string;
+  private format: FormatType;
 
-  constructor(repeatCreateDeck = 2) {
+  constructor(repeatCreateDeck = 2, format: FormatType = 4) {
     this.repeatCreate = repeatCreateDeck;
+    this.format = format;
     this.deck = this.createDeck(repeatCreateDeck);
     this.shuffle();
 
     this.savedDeck = this.toJSON();
-    console.log(this.savedDeck);
   }
 
-  private createDeck(repeatCreateDeck: number): Card[] {
-    const suits: CardSuit[] = ["Heart", "Diamond", "Club", "Spade"];
+  private createDeck(repeatCreateDeck: number): CardType[] {
+    const deck: CardType[] = [];
+    const suits: CardSuit[] = this.getSuitsForFormat();
     const values: CardValue[] = [
       "A",
       "2",
@@ -32,16 +40,27 @@ export default class Deck {
       "K",
     ];
 
-    const deck: Card[] = [];
-    for (let index = 0; index < repeatCreateDeck; index++) {
+    for (let i = 0; i < repeatCreateDeck; i++) {
       for (const suit of suits) {
         for (const value of values) {
           deck.push({ suit, value, isDiscovered: false });
         }
       }
     }
-
     return deck;
+  }
+
+  private getSuitsForFormat(): CardSuit[] {
+    switch (this.format) {
+      case 1:
+        return Array(4).fill("Spade");
+      case 2:
+        return ["Spade", "Heart", "Spade", "Heart"];
+      case 4:
+        return ["Heart", "Diamond", "Club", "Spade"];
+      default:
+        throw new Error(`Invalid format: ${this.format}`);
+    }
   }
 
   shuffle(randomFn: RandomFunction = Math.random): void {

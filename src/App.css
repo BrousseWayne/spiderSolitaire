@@ -11,6 +11,7 @@
   cursor: pointer;
   position: absolute;
   transition: top 0.2s;
+  box-shadow: 0 0 0 2px red; /* Red outline for hitbox */
 }
 
 .card-inner {
@@ -91,7 +92,7 @@
 .stack {
   position: relative;
   width: 100px;
-  height: 400px;
+  height: 500px;
 }
 
 .emptyStack {
@@ -132,7 +133,7 @@
   flex-direction: row;
   gap: 12px;
   flex-wrap: wrap;
-  margin-top: 20px;
+  /* margin-top: 20px; */
 }
 
 .drop-win {
@@ -151,4 +152,9 @@
   width: 80px;
   height: 120px;
   pointer-events: none;
+}
+
+.undo {
+  height: 100px;
+  width: 100px;
 }

@@ -2,10 +2,9 @@ import { getCardImage } from "./cards";
 import cardBack from "./assets/cards back/tile023.png";
 import "./App.css";
 
-import type { CardProps } from "./types";
+import type { BackCardProps, CardProps } from "./types";
 import { useDraggable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
-import { motion } from "motion/react";
 
 export default function Card({
   suit,
@@ -55,7 +54,7 @@ export default function Card({
   );
 }
 
-export function BackCard({ style }) {
+export function BackCard({ style }: BackCardProps) {
   const backImage = cardBack;
 
   return (

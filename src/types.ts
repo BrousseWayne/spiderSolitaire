@@ -54,6 +54,18 @@ export type SelectedCard = {
 
 export type GameAction =
   | { type: "MOVE_CARD"; src: SelectedCard; dest: SelectedCard }
-  | { type: "DRAW_FROM_PILE" };
+  | { type: "DRAW_FROM_PILE" }
+  | { type: "UNDO" }
+  | { type: "REDO" };
 
-export type GameState = BoardType; // We'll expand this later
+export type GameState = {
+  present: BoardType;
+  past: BoardType[];
+  future: BoardType[];
+};
+
+export type BackCardProps = {
+  style: CSSProperties;
+};
+
+export type FormatType = 1 | 2 | 4;

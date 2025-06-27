@@ -1,7 +1,7 @@
 import { useReducer, useState } from "react";
 import "./App.css";
 import Deck from "./deck";
-import type { BoardType, CardType, CardsInGame, SelectedCard } from "./types";
+import type { BoardType, CardType, CardsInGame } from "./types";
 import {
   DndContext,
   type DragEndEvent,
@@ -23,8 +23,10 @@ function createBoard(deck: Deck): BoardType {
 
   function assignId(card: CardType) {
     const partialId = createIdString(card);
-    if (assignedId.get(partialId) === 0) {
-      return `${partialId}-1`;
+    if (assignedId.get(partialId)! >= 0) {
+      const curr = assignedId.get(partialId)! + 1;
+      assignedId.set(partialId, curr);
+      return `${partialId}-${curr}`;
     } else {
       assignedId.set(partialId, 0);
       return `${partialId}-0`;
@@ -60,15 +62,19 @@ function createBoard(deck: Deck): BoardType {
 }
 
 function App() {
-  const [state, dispatch] = useReducer(gameReducer, null, () =>
-    createBoard(new Deck(2))
-  );
+  const [state, dispatch] = useReducer(gameReducer, {
+    present: createBoard(new Deck(2, 1)),
+    past: [],
+    future: [],
+  });
+
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const [movingCards, setMovingCards] = useState<CardsInGame[]>([]);
 
   const handleDragStart = ({ active }: DragStartEvent) => {
+    console.log("Where am I ????");
     const [_, __, stackIndex, cardIndex] = active.id.split("-");
-    const stack = state.cards[parseInt(stackIndex)];
+    const stack = state.present.cards[parseInt(stackIndex)];
     setMovingCards(stack.slice(parseInt(cardIndex)));
     setActiveId(active.id);
   };
@@ -79,7 +85,10 @@ function App() {
       return;
     }
 
-    const [_, __, stackIndex, cardIndex] = activeId.split("-");
+    console.log("Where am I");
+
+    const activeIdStr = String(activeId); // Convert to string first
+    const [_, __, stackIndex, cardIndex] = activeIdStr.split("-");
     const src = {
       stackIndex: parseInt(stackIndex),
       cardIndex: parseInt(cardIndex),
@@ -88,7 +97,7 @@ function App() {
     const destStackIndex = parseInt(over.id.replace("stack-", ""));
     const dest = {
       stackIndex: destStackIndex,
-      cardIndex: state.cards[destStackIndex].length,
+      cardIndex: state.present.cards[destStackIndex].length,
     };
 
     dispatch({ type: "MOVE_CARD", src, dest });
@@ -99,10 +108,13 @@ function App() {
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <Undo onClick={() => dispatch({ type: "UNDO" })} />
+      <Redo onClick={() => dispatch({ type: "REDO" })} />
+
       <div className="container">
         <div className="top-bar">
           <Draw
-            draw={state.draw}
+            draw={state.present.draw}
             onClick={() => dispatch({ type: "DRAW_FROM_PILE" })}
           />
           <div className="win-stacks">
@@ -111,9 +123,24 @@ function App() {
             ))}
           </div>
         </div>
-        <Board board={state.cards} activeId={activeId ?? ""} />
+        <Board board={state.present.cards} activeId={activeId ?? ""} />
       </div>
     </DndContext>
+  );
+}
+
+function Undo({ onClick }) {
+  return (
+    <button onClick={onClick} className="undo">
+      UNDO
+    </button>
+  );
+}
+function Redo({ onClick }) {
+  return (
+    <button onClick={onClick} className="undo">
+      REDO
+    </button>
   );
 }
 
