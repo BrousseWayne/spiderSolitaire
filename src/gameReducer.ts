@@ -109,6 +109,7 @@ function undo(state: GameState) {
     past: remainingPast,
     future: [state.present, ...state.future],
     present: previousState,
+    hasWon: isWinConditionMet(previousState.cards),
   };
 }
 
@@ -121,6 +122,7 @@ function redo(state: GameState) {
     past: [state.present, ...state.past],
     future: remainingFuture,
     present: nextState,
+    hasWon: isWinConditionMet(nextState.cards),
   };
 }
 

@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import "./App.css";
 import Deck from "./deck";
 import type { BoardType, CardType, CardsInGame } from "./types";
@@ -69,6 +69,14 @@ function App() {
     hasWon: false,
   });
 
+  const [showWinModal, setShowWinModal] = useState(false);
+
+  useEffect(() => {
+    if (state.hasWon) {
+      setShowWinModal(true);
+    }
+  }, [state.hasWon]);
+
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const [movingCards, setMovingCards] = useState<CardsInGame[]>([]);
 
@@ -124,6 +132,14 @@ function App() {
         </div>
         <Board board={state.present.cards} activeId={activeId ?? ""} />
       </div>
+      {showWinModal && (
+        <div className="overlay">
+          <div className="modal">
+            <p>You win</p>
+            <button onClick={() => setShowWinModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </DndContext>
   );
 }
