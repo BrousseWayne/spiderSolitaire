@@ -7,27 +7,58 @@ import type {
   SelectedCard,
 } from "./types";
 
+function resolveSequencesAndUpdate(state: GameState): GameState {
+  const { sequences, updatedTableau, updatedStacks } = getCompletedSequences(
+    state.present.cards
+  );
+
+  updatedStacks.forEach((stackIndex) => {
+    const newTopCardIndex = updatedTableau[stackIndex].length - 1;
+    if (newTopCardIndex >= 0) {
+      const topCard = updatedTableau[stackIndex][newTopCardIndex];
+      if (!topCard.isDiscovered) {
+        updatedTableau[stackIndex][newTopCardIndex] = {
+          ...topCard,
+          isDiscovered: true,
+        };
+      }
+    }
+  });
+
+  return {
+    ...state,
+    present: {
+      ...state.present,
+      cards: updatedTableau,
+    },
+  };
+}
+
+function isWinConditionMet(cards: CardsInGame[][]): boolean {
+  return cards.every((stack) => stack.length === 0);
+}
+
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "MOVE_CARD": {
-      console.log("enter move");
       const movedState = moveCards(state, action.src, action.dest);
 
-      const { sequences, updatedTableau } = getCompletedSequences(
-        movedState.present.cards
-      );
+      const resolvedState = resolveSequencesAndUpdate(movedState);
 
       return {
-        ...movedState,
-        present: {
-          ...movedState.present,
-          cards: updatedTableau,
-        },
+        ...resolvedState,
         past: [state.present, ...movedState.past],
+        hasWon: isWinConditionMet(resolvedState.present.cards),
       };
     }
-    case "DRAW_FROM_PILE":
-      return drawFromPile(state);
+    case "DRAW_FROM_PILE": {
+      const drawnState = drawFromPile(state);
+      const resolvedState = resolveSequencesAndUpdate(drawnState);
+      return {
+        ...resolvedState,
+        hasWon: isWinConditionMet(resolvedState.present.cards),
+      };
+    }
     case "UNDO":
       return undo(state);
     case "REDO":
@@ -40,30 +71,33 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 function getCompletedSequences(cards: CardsInGame[][]): {
   sequences: CardsInGame[][];
   updatedTableau: CardsInGame[][];
+  updatedStacks: number[];
 } {
   const sequences: CardsInGame[][] = [];
   const updatedTableau = cards.map((stack) => [...stack]);
+  const updatedStacks = [];
 
   for (let stackIndex = 0; stackIndex < updatedTableau.length; stackIndex++) {
     const stack = updatedTableau[stackIndex];
-    if (stack.length < 13) continue; // Not enough cards for K→A
+    if (stack.length < 13) continue;
 
-    // Check if last 13 cards form a valid sequence
     const potentialSequence = stack.slice(-13);
     if (isValidSequence(potentialSequence)) {
+      console.log("valid sequence", stackIndex);
+      updatedStacks.push(stackIndex);
       sequences.push(potentialSequence);
-      updatedTableau[stackIndex] = stack.slice(0, -13); // Remove sequence
+      updatedTableau[stackIndex] = stack.slice(0, -13);
     }
   }
 
-  return { sequences, updatedTableau };
+  return { sequences, updatedTableau, updatedStacks };
 }
 
 function isValidSequence(cards: CardsInGame[]): boolean {
   const targetSuit = cards[0].suit;
   return cards.every(
     (card, index) =>
-      card.suit === targetSuit && CARD_VALUES.get(card.value) === 13 - index // K=13, Q=12,...,A=1
+      card.suit === targetSuit && CARD_VALUES.get(card.value) === 13 - index
   );
 }
 function undo(state: GameState) {
@@ -95,7 +129,6 @@ function moveCards(
   src: SelectedCard,
   dest: SelectedCard
 ): GameState {
-  console.log("b4 check isMovevalid");
   if (!isMoveValid(state.present, src, dest)) return state;
 
   const newCards = state.present.cards.map((stack) => [...stack]);
@@ -106,7 +139,9 @@ function moveCards(
     ...movingCards,
   ].map((card, i) => ({ ...card, stackId: dest.stackIndex, indexInStack: i }));
 
+  console.log("should be here");
   const sourceStack = newCards[src.stackIndex];
+  console.log(sourceStack);
   if (sourceStack.length > 0) {
     const lastIndex = sourceStack.length - 1;
     sourceStack[lastIndex] = { ...sourceStack[lastIndex], isDiscovered: true };
@@ -148,9 +183,6 @@ function isMoveValid(
   src: SelectedCard,
   dest: SelectedCard
 ): boolean {
-  console.log("=== isMoveValid START ===");
-  console.log("Source card:", src);
-  console.log("Destination card:", dest);
   const srcStack = presentState.cards[src.stackIndex];
   const movingCards = srcStack.slice(src.cardIndex);
 
@@ -162,9 +194,7 @@ function isMoveValid(
     return card.suit === firstSuit && currValue === prevValue! - 1;
   });
 
-  console.log("b4 valid check");
   if (!isSequenceValid) return false;
-  console.log("valid");
   const destStack = presentState.cards[dest.stackIndex];
   if (destStack.length === 0) return true;
 

@@ -62,6 +62,7 @@ export type GameState = {
   present: BoardType;
   past: BoardType[];
   future: BoardType[];
+  hasWon: boolean;
 };
 
 export type BackCardProps = {
