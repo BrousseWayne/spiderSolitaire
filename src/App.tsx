@@ -66,13 +66,13 @@ function App() {
     present: createBoard(new Deck(2, 1)),
     past: [],
     future: [],
+    hasWon: false,
   });
 
   const [activeId, setActiveId] = useState<UniqueIdentifier>();
   const [movingCards, setMovingCards] = useState<CardsInGame[]>([]);
 
   const handleDragStart = ({ active }: DragStartEvent) => {
-    console.log("Where am I ????");
     const [_, __, stackIndex, cardIndex] = active.id.split("-");
     const stack = state.present.cards[parseInt(stackIndex)];
     setMovingCards(stack.slice(parseInt(cardIndex)));
@@ -84,8 +84,6 @@ function App() {
       setMovingCards([]);
       return;
     }
-
-    console.log("Where am I");
 
     const activeIdStr = String(activeId); // Convert to string first
     const [_, __, stackIndex, cardIndex] = activeIdStr.split("-");
@@ -101,6 +99,7 @@ function App() {
     };
 
     dispatch({ type: "MOVE_CARD", src, dest });
+
     setMovingCards([]);
   };
 
