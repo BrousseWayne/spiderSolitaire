@@ -10,6 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { Board, Draw, Foundation } from "./board";
 import { gameReducer } from "./gameReducer";
+import { Button } from "./components/ui/button";
 
 function createBoard(deck: Deck): BoardType {
   const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
@@ -136,7 +137,7 @@ function App() {
         <div className="overlay">
           <div className="modal">
             <p>You win</p>
-            <button onClick={() => setShowWinModal(false)}>Close</button>
+            <Button onClick={() => setShowWinModal(false)}>Close</Button>
           </div>
         </div>
       )}
@@ -146,16 +147,16 @@ function App() {
 
 function Undo({ onClick }) {
   return (
-    <button onClick={onClick} className="undo">
+    <Button variant="secondary" onClick={onClick} className="undo">
       UNDO
-    </button>
+    </Button>
   );
 }
 function Redo({ onClick }) {
   return (
-    <button onClick={onClick} className="undo">
+    <Button variant="secondary" onClick={onClick} className="undo">
       REDO
-    </button>
+    </Button>
   );
 }
 

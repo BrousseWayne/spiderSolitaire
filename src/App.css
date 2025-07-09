@@ -153,11 +153,6 @@
   pointer-events: none;
 }
 
-.undo {
-  height: 100px;
-  width: 100px;
-}
-
 .overlay {
   position: fixed;
   top: 0;
