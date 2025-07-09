@@ -11,6 +11,7 @@ import {
 import { Board, Draw, Foundation } from "./board";
 import { gameReducer } from "./gameReducer";
 import { Button } from "./components/ui/button";
+import { useGameConfig } from "./gameContext";
 
 function createBoard(deck: Deck): BoardType {
   const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
@@ -63,8 +64,9 @@ function createBoard(deck: Deck): BoardType {
 }
 
 function App() {
+  const { suits } = useGameConfig();
   const [state, dispatch] = useReducer(gameReducer, {
-    present: createBoard(new Deck(2, 1)),
+    present: createBoard(new Deck(2, suits)),
     past: [],
     future: [],
     hasWon: false,
