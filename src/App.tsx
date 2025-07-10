@@ -1,7 +1,6 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import Deck from "./deck";
-import type { BoardType, CardType, CardsInGame } from "./types";
+import type { CardsInGame } from "./types";
 import {
   DndContext,
   type DragEndEvent,
@@ -9,68 +8,13 @@ import {
   type UniqueIdentifier,
 } from "@dnd-kit/core";
 import { Board, Draw, Foundation } from "./board";
-import { gameReducer } from "./gameReducer";
 import { Button } from "./components/ui/button";
-import { useGameConfig } from "./gameContext";
+import { useGame } from "./gameStateContext";
 
-function createBoard(deck: Deck): BoardType {
-  const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
-  const draw: CardsInGame[][] = Array.from({ length: 5 }, () => []);
-
-  const assignedId = new Map<string, number>();
-
-  function createIdString(card: CardType) {
-    return `${card.suit}-${card.value}`;
-  }
-
-  function assignId(card: CardType) {
-    const partialId = createIdString(card);
-    if (assignedId.get(partialId)! >= 0) {
-      const curr = assignedId.get(partialId)! + 1;
-      assignedId.set(partialId, curr);
-      return `${partialId}-${curr}`;
-    } else {
-      assignedId.set(partialId, 0);
-      return `${partialId}-0`;
-    }
-  }
-
-  function drawCards(
-    cardsToDraw: number,
-    storage: CardsInGame[][],
-    isDiscovered: boolean,
-    stacks: number
-  ) {
-    for (let i = 0; i < cardsToDraw; i++) {
-      const card = deck.draw(1)[0];
-      const stackId = i % stacks;
-
-      storage[stackId].push({
-        ...card,
-        id: assignId(card),
-        stackId,
-        indexInStack: storage[stackId].length,
-        isDiscovered,
-      });
-    }
-  }
-
-  drawCards(40, stacks, false, 10);
-  drawCards(4, stacks, false, 10);
-  drawCards(10, stacks, true, 10);
-  drawCards(deck.cards.length, draw, false, 5);
-
-  return { cards: stacks, draw: draw };
-}
+//TODO: Fix gameconfig issue with the context
 
 function App() {
-  const { suits } = useGameConfig();
-  const [state, dispatch] = useReducer(gameReducer, {
-    present: createBoard(new Deck(2, suits)),
-    past: [],
-    future: [],
-    hasWon: false,
-  });
+  const { state, dispatch, newGame } = useGame();
 
   const [showWinModal, setShowWinModal] = useState(false);
 
@@ -120,6 +64,7 @@ function App() {
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <Undo onClick={() => dispatch({ type: "UNDO" })} />
       <Redo onClick={() => dispatch({ type: "REDO" })} />
+      <NewGame onClick={() => newGame()} />
 
       <div className="container">
         <div className="top-bar">
@@ -144,6 +89,14 @@ function App() {
         </div>
       )}
     </DndContext>
+  );
+}
+
+function NewGame({ onClick }) {
+  return (
+    <Button variant="secondary" onClick={onClick} className="undo">
+      NEW GAME
+    </Button>
   );
 }
 

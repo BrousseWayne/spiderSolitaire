@@ -56,6 +56,7 @@ export type GameAction =
   | { type: "MOVE_CARD"; src: SelectedCard; dest: SelectedCard }
   | { type: "DRAW_FROM_PILE" }
   | { type: "UNDO" }
+  | { type: "NEW_GAME"; payload: BoardType }
   | { type: "REDO" };
 
 export type GameState = {

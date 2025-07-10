@@ -63,6 +63,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return undo(state);
     case "REDO":
       return redo(state);
+    case "NEW_GAME": {
+      return {
+        present: action.payload,
+        past: [],
+        future: [],
+        hasWon: false,
+      };
+    }
     default:
       return state;
   }

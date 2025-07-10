@@ -8,14 +8,13 @@ import { GameConfigProvider } from "./gameContext.tsx";
 import { useGameConfig } from "./gameContext";
 import { useNavigate } from "react-router";
 import { Button } from "./components/ui/button.tsx";
+import { GameStateProvider } from "./gameStateContext.tsx";
 
 function Landing() {
-  const { setSuits } = useGameConfig();
   const navigate = useNavigate();
 
-  const startGame = (suits: number) => {
-    setSuits(suits);
-    navigate("/spidy");
+  const startGame = (suits) => {
+    navigate("/spidy", { state: { suits } });
   };
 
   return (
@@ -35,13 +34,15 @@ function Landing() {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GameConfigProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/spidy" element={<App />} />
-        </Routes>
-      </BrowserRouter>
-    </GameConfigProvider>
+    <BrowserRouter>
+      <GameConfigProvider>
+        <GameStateProvider>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/spidy" element={<App />} />
+          </Routes>
+        </GameStateProvider>
+      </GameConfigProvider>
+    </BrowserRouter>
   </StrictMode>
 );

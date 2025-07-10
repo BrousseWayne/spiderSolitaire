@@ -1,6 +1,7 @@
 import { useDroppable, type UniqueIdentifier } from "@dnd-kit/core";
 import Card, { BackCard } from "./card";
-import type { CardsInGame } from "./types";
+import type { BoardType, CardsInGame, CardType } from "./types";
+import type Deck from "./deck";
 
 interface StackProps {
   stack: CardsInGame[];
@@ -10,6 +11,56 @@ interface StackProps {
 
 interface FoundationProps {
   id: number;
+}
+
+export function createBoard(deck: Deck): BoardType {
+  const stacks: CardsInGame[][] = Array.from({ length: 10 }, () => []);
+  const draw: CardsInGame[][] = Array.from({ length: 5 }, () => []);
+
+  const assignedId = new Map<string, number>();
+
+  function createIdString(card: CardType) {
+    return `${card.suit}-${card.value}`;
+  }
+
+  function assignId(card: CardType) {
+    const partialId = createIdString(card);
+    if (assignedId.get(partialId)! >= 0) {
+      const curr = assignedId.get(partialId)! + 1;
+      assignedId.set(partialId, curr);
+      return `${partialId}-${curr}`;
+    } else {
+      assignedId.set(partialId, 0);
+      return `${partialId}-0`;
+    }
+  }
+
+  function drawCards(
+    cardsToDraw: number,
+    storage: CardsInGame[][],
+    isDiscovered: boolean,
+    stacks: number
+  ) {
+    for (let i = 0; i < cardsToDraw; i++) {
+      const card = deck.draw(1)[0];
+      const stackId = i % stacks;
+
+      storage[stackId].push({
+        ...card,
+        id: assignId(card),
+        stackId,
+        indexInStack: storage[stackId].length,
+        isDiscovered,
+      });
+    }
+  }
+
+  drawCards(40, stacks, false, 10);
+  drawCards(4, stacks, false, 10);
+  drawCards(10, stacks, true, 10);
+  drawCards(deck.cards.length, draw, false, 5);
+
+  return { cards: stacks, draw: draw };
 }
 
 export function Stack({ stack, stackIndex, activeId }: StackProps) {
