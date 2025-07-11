@@ -5,32 +5,33 @@ import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { GameConfigProvider } from "./gameContext.tsx";
 
-import { useGameConfig } from "./gameContext";
+// import { useGameConfig } from "./gameContext";
 import { useNavigate } from "react-router";
 import { Button } from "./components/ui/button.tsx";
 import { GameStateProvider } from "./gameStateContext.tsx";
+import { CardDemo } from "./loginCard.tsx";
 
-function Landing() {
-  const navigate = useNavigate();
+// function Landing() {
+//   const navigate = useNavigate();
 
-  const startGame = (suits) => {
-    navigate("/spidy", { state: { suits } });
-  };
+//   const startGame = (suits) => {
+//     navigate("/spidy", { state: { suits } });
+//   };
 
-  return (
-    <div className="flex items-center justify-center h-screen gap-5">
-      <Button variant={"outline"} onClick={() => startGame(1)}>
-        1 Suit
-      </Button>
-      <Button variant={"outline"} onClick={() => startGame(2)}>
-        2 Suits
-      </Button>
-      <Button variant={"outline"} onClick={() => startGame(4)}>
-        4 Suits
-      </Button>
-    </div>
-  );
-}
+//   return (
+//     <div className="flex items-center justify-center h-screen gap-5">
+//       <Button variant={"outline"} onClick={() => startGame(1)}>
+//         1 Suit
+//       </Button>
+//       <Button variant={"outline"} onClick={() => startGame(2)}>
+//         2 Suits
+//       </Button>
+//       <Button variant={"outline"} onClick={() => startGame(4)}>
+//         4 Suits
+//       </Button>
+//     </div>
+//   );
+// }
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -38,7 +39,7 @@ createRoot(document.getElementById("root")!).render(
       <GameConfigProvider>
         <GameStateProvider>
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<CardDemo />} />
             <Route path="/spidy" element={<App />} />
           </Routes>
         </GameStateProvider>
