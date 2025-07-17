@@ -9,6 +9,8 @@ import { GameConfigProvider } from "./gameContext.tsx";
 import { GameStateProvider } from "./gameStateContext.tsx";
 import { LoginCard } from "./loginCard.tsx";
 import { RegisterCard } from "./registerCard.tsx";
+import { Profile } from "./profile.tsx";
+import { SecureRoutes } from "./secureRoutes.tsx";
 
 // function Landing() {
 //   const navigate = useNavigate();
@@ -38,6 +40,9 @@ createRoot(document.getElementById("root")!).render(
       <GameConfigProvider>
         <GameStateProvider>
           <Routes>
+            <Route element={<SecureRoutes />}>
+              <Route path="/profile" element={<Profile />} />
+            </Route>
             <Route path="/login" element={<LoginCard />} />
             <Route path="/register" element={<RegisterCard />} />
             <Route path="/spidy" element={<App />} />
@@ -47,3 +52,5 @@ createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </StrictMode>
 );
+
+//TODO: A context for the AUTH, add a logout button create a global layout with the logout button active if user is logged

@@ -10,34 +10,48 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.currentTarget);
-  const email = formData.get("email");
-  const password = formData.get("password");
-  console.log(email, password);
-
-  try {
-    const response = await fetch(`http://localhost:3000/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    });
-
-    const data = await response.json();
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-};
 
 export function LoginCard() {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+    console.log(email, password);
+
+    try {
+      const response = await fetch(`http://localhost:3000/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        console.log(await response.json());
+        setError("Invalid Credentials");
+        return;
+      }
+
+      if (!response.ok) {
+        setError("Registration failed");
+        return;
+      }
+
+      const data = await response.json();
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -75,6 +89,16 @@ export function LoginCard() {
                 </a>
               </div>
               <Input id="password" name="password" type="password" required />
+              <p
+                id="password-error"
+                role="alert"
+                className={`text-sm mt-1 ${
+                  error ? "text-red-600" : "invisible"
+                }`}
+                style={{ minHeight: "1.25rem" }}
+              >
+                {error || " "}
+              </p>
             </div>
           </div>
         </form>

@@ -13,34 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.currentTarget);
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
-
-  if (password !== confirmPassword) {
-    console.error("Passwords do not match");
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:3000/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-
-    const data = await response.json();
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-};
+//TODO: better flow, for the error messages
 
 const isValidPassword = (password: string) => {
   const minLength = 8;
@@ -51,19 +24,79 @@ const isValidPassword = (password: string) => {
 
 export function RegisterCard() {
   const [error, setError] = useState<string | null>(null);
+  const [formFilled, setFormFilled] = useState(false);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pwd = e.target.value;
-    if (!isValidPassword(pwd)) {
+  const navigate = useNavigate();
+
+  const validateForm = (form: HTMLFormElement) => {
+    const email = form.email.value.trim();
+    const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value;
+
+    const filled =
+      email.length > 0 && password.length > 0 && confirmPassword.length > 0;
+    setFormFilled(filled);
+
+    if (!filled) return false;
+
+    if (!isValidPassword(password)) {
       setError(
         "Password must be 8+ characters, include uppercase, lowercase, and a number."
       );
+      return false;
     } else {
       setError(null);
     }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+
+    setError(null);
+    return true;
   };
 
-  const navigate = useNavigate();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const form = e.currentTarget.form as HTMLFormElement;
+    validateForm(form);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement;
+
+    if (!validateForm(form)) return;
+
+    const formData = new FormData(form);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const response = await fetch(`http://localhost:3000/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.status === 409) {
+        console.log(await response.json());
+        setError("Email is already registered");
+        return;
+      }
+
+      if (!response.ok) {
+        setError("Registration failed");
+        return;
+      }
+
+      const data = await response.json();
+      setError(null);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -92,6 +125,9 @@ export function RegisterCard() {
                 type="email"
                 placeholder="m@example.com"
                 required
+                onChange={handleInputChange}
+                aria-invalid={!!error}
+                aria-describedby="password-error"
               />
             </div>
             <div className="grid gap-2">
@@ -101,7 +137,7 @@ export function RegisterCard() {
                 name="password"
                 type="password"
                 required
-                onChange={handlePasswordChange}
+                onChange={handleInputChange}
                 aria-invalid={!!error}
                 aria-describedby="password-error"
               />
@@ -123,13 +159,21 @@ export function RegisterCard() {
                 name="confirmPassword"
                 type="password"
                 required
+                onChange={handleInputChange}
+                aria-invalid={!!error}
+                aria-describedby="password-error"
               />
             </div>
           </div>
         </form>
       </CardContent>
       <CardFooter>
-        <Button type="submit" form="register-form" className="w-full">
+        <Button
+          type="submit"
+          form="register-form"
+          className="w-full"
+          disabled={!formFilled || !!error}
+        >
           Register
         </Button>
       </CardFooter>
