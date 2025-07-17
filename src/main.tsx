@@ -6,10 +6,9 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { GameConfigProvider } from "./gameContext.tsx";
 
 // import { useGameConfig } from "./gameContext";
-import { useNavigate } from "react-router";
-import { Button } from "./components/ui/button.tsx";
 import { GameStateProvider } from "./gameStateContext.tsx";
-import { CardDemo } from "./loginCard.tsx";
+import { LoginCard } from "./loginCard.tsx";
+import { RegisterCard } from "./registerCard.tsx";
 
 // function Landing() {
 //   const navigate = useNavigate();
@@ -39,7 +38,8 @@ createRoot(document.getElementById("root")!).render(
       <GameConfigProvider>
         <GameStateProvider>
           <Routes>
-            <Route path="/" element={<CardDemo />} />
+            <Route path="/login" element={<LoginCard />} />
+            <Route path="/register" element={<RegisterCard />} />
             <Route path="/spidy" element={<App />} />
           </Routes>
         </GameStateProvider>

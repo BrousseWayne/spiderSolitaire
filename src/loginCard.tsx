@@ -10,30 +10,34 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router";
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  console.log("what the ß");
 
   const formData = new FormData(e.currentTarget);
   const email = formData.get("email");
   const password = formData.get("password");
   console.log(email, password);
 
-  //   try {
-  //     const response = await fetch(`http://localhost:3000/moves`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({}),
-  //     });
+  try {
+    const response = await fetch(`http://localhost:3000/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    });
 
-  //     const data = await response.json();
-  //   } catch (error) {
-  //     console.error("Fetch error:", error);
-  //   }
+    const data = await response.json();
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
 };
 
-export function CardDemo() {
+export function LoginCard() {
+  const navigate = useNavigate();
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -42,7 +46,13 @@ export function CardDemo() {
           Enter your email below to login to your account
         </CardDescription>
         <CardAction>
-          <Button variant="link">Sign Up</Button>
+          <Button
+            variant="link"
+            onClick={() => navigate("/register")}
+            className="cursor-pointer"
+          >
+            Sign Up
+          </Button>
         </CardAction>
       </CardHeader>
       <CardContent>
