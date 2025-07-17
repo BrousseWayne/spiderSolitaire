@@ -30,3 +30,4 @@ export function SecureRoutes() {
 }
 
 //TODO: spinner for the loading ?
+//TODO: Flash when navigating ??
