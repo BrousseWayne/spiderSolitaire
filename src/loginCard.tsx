@@ -46,11 +46,7 @@ export function LoginCard() {
           Enter your email below to login to your account
         </CardDescription>
         <CardAction>
-          <Button
-            variant="link"
-            onClick={() => navigate("/register")}
-            className="cursor-pointer"
-          >
+          <Button variant="link" onClick={() => navigate("/register")}>
             Sign Up
           </Button>
         </CardAction>
