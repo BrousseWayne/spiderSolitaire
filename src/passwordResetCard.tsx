@@ -1,7 +1,8 @@
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -10,25 +11,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useNavigate } from "react-router";
 import { isValidPassword } from "./lib/utils";
 
-//TODO: better flow, for the error messages
-
-export function RegisterCard() {
+export function PasswordResetCard() {
   const [error, setError] = useState<string | null>(null);
   const [formFilled, setFormFilled] = useState(false);
-
+  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
 
   const validateForm = (form: HTMLFormElement) => {
-    const email = form.email.value.trim();
     const password = form.password.value;
     const confirmPassword = form.confirmPassword.value;
-
-    const filled =
-      email.length > 0 && password.length > 0 && confirmPassword.length > 0;
+    const filled = password.length > 0 && confirmPassword.length > 0;
     setFormFilled(filled);
 
     if (!filled) return false;
@@ -63,62 +59,64 @@ export function RegisterCard() {
     if (!validateForm(form)) return;
 
     const formData = new FormData(form);
-    const email = formData.get("email");
     const password = formData.get("password");
 
     try {
-      const response = await fetch(`http://localhost:3000/register`, {
+      const response = await fetch(`http://localhost:3000/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ token, password }),
       });
 
-      if (response.status === 409) {
-        console.log(await response.json());
-        setError("Email is already registered");
-        return;
-      }
-
       if (!response.ok) {
-        setError("Registration failed");
+        setError("Failed to reset password. Token may be invalid or expired.");
         return;
       }
 
-      const data = await response.json();
       setError(null);
-    } catch (error) {
-      console.error("Fetch error:", error);
+      setSubmitted(true);
+    } catch (err) {
+      setError("Network error.");
+      console.error(err);
     }
   };
+
+  if (submitted)
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-sm text-center">
+          <CardHeader>
+            <CardTitle>Password Reset Successful</CardTitle>
+            <CardDescription>
+              Your password has been updated. You can now log in with your new
+              password.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={() => navigate("/login")} className="w-full">
+              Go to Login
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create your account</CardTitle>
-          <CardDescription>
-            Enter your email and password to register
-          </CardDescription>
-          <CardAction>
-            <Button
-              variant="link"
-              onClick={() => navigate("/login")}
-              className="cursor-pointer"
-            >
-              Already have an account?
-            </Button>
-          </CardAction>
+          <CardTitle>Reset Your Password</CardTitle>
+          <CardDescription>Enter a new password below</CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="register-form" onSubmit={handleSubmit}>
+          <form id="reset-password-form" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="password">New Password</Label>
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="password"
+                  name="password"
+                  type="password"
                   required
                   onChange={handleInputChange}
                   aria-invalid={!!error}
@@ -126,10 +124,10 @@ export function RegisterCard() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
                 <Input
-                  id="password"
-                  name="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
                   type="password"
                   required
                   onChange={handleInputChange}
@@ -147,29 +145,17 @@ export function RegisterCard() {
                   {error || " "}
                 </p>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  onChange={handleInputChange}
-                  aria-invalid={!!error}
-                  aria-describedby="password-error"
-                />
-              </div>
             </div>
           </form>
         </CardContent>
         <CardFooter>
           <Button
             type="submit"
-            form="register-form"
+            form="reset-password-form"
             className="w-full"
             disabled={!formFilled || !!error}
           >
-            Register
+            Reset Password
           </Button>
         </CardFooter>
       </Card>

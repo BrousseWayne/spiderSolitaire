@@ -13,18 +13,23 @@ export function SecureRoutes() {
           credentials: "include",
         });
         setAuthenticated(res.ok);
-        setLoading(false);
       } catch {
         setAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, []);
 
-  if (loading) return null;
+  useEffect(() => {
+    if (!loading && !authenticated) {
+      navigate("/login");
+    }
+  }, [loading, authenticated, navigate]);
 
-  if (!authenticated) navigate("/login");
+  if (loading || !authenticated) return null;
 
   return <Outlet />;
 }
