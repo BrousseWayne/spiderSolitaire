@@ -39,11 +39,24 @@ export function VerifyEmail() {
     sendTokenToBackend();
   }, [token]);
 
+  const sendEmailAgain = () => {};
+
   if (error) {
     return (
-      <div>
-        TOKEN EXPIRED SEND AGAIN TOKEN EXPIRED SEND AGAIN TOKEN EXPIRED SEND
-        AGAIN TOKEN EXPIRED SEND AGAIN
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-sm text-center">
+          <CardHeader>
+            <CardTitle>Expired token</CardTitle>
+            <CardDescription>
+              Your email verification token has expired.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={() => sendEmailAgain()} className="w-full">
+              Send again
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
@@ -66,3 +79,5 @@ export function VerifyEmail() {
     </div>
   );
 }
+
+//TODO: resend email scheme
