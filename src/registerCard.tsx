@@ -13,12 +13,15 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { isValidPassword } from "./lib/utils";
+import { SpinnerUI } from "./loginCard";
 
 //TODO: better flow, for the error messages
 
 export function RegisterCard() {
   const [error, setError] = useState<string | null>(null);
   const [formFilled, setFormFilled] = useState(false);
+  const [emailToValidate, setEmailToValidate] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,6 +51,7 @@ export function RegisterCard() {
     }
 
     setError(null);
+    setEmailToValidate(email);
     return true;
   };
 
@@ -84,12 +88,15 @@ export function RegisterCard() {
         return;
       }
 
-      const data = await response.json();
       setError(null);
+      setIsLoading(true);
     } catch (error) {
       console.error("Fetch error:", error);
     }
   };
+
+  if (isLoading && emailToValidate)
+    return <SpinnerUI email={emailToValidate} />;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
