@@ -12,16 +12,68 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
+
+export function SpinnerUI({ email }) {
+  const [pollingAttempts, setPollingAttempts] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("http://localhost:3000/email-verified", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+          }),
+        });
+        const data = await res.json();
+
+        if (data.verified) {
+          clearInterval(interval);
+          navigate("/spidy");
+        } else {
+          setPollingAttempts((prev) => prev + 1);
+        }
+
+        if (pollingAttempts >= 20) {
+          clearInterval(interval);
+          navigate("/login");
+        }
+      } catch (err) {
+        clearInterval(interval);
+        navigate("/login");
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
+      <Loader2 className="animate-spin w-10 h-10 text-gray-600" />
+      <h1 className="text-xl font-semibold">Waiting for email verification</h1>
+      <p className="text-sm text-muted-foreground max-w-sm">
+        Please check your inbox and click the verification link we sent to your
+        email. This page will automatically update once your email is verified.
+      </p>
+    </div>
+  );
+}
 
 export function LoginCard() {
   const navigate = useNavigate();
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const [emailToVerify, setEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    const email = formData.get("email")?.toString();
+    const password = formData.get("password")?.toString();
     console.log(email, password);
 
     try {
@@ -41,16 +93,28 @@ export function LoginCard() {
         return;
       }
 
+      if (response.status === 600) {
+        console.log(await response.json());
+        setIsVerified(false);
+        setError("Waiting email verification");
+        setEmail(email);
+        return;
+      }
+
       if (!response.ok) {
         setError("Registration failed");
         return;
       }
 
-      const data = await response.json();
+      setIsVerified(true);
     } catch (error) {
       console.error("Fetch error:", error);
     }
   };
+
+  if (isVerified === false) {
+    return <SpinnerUI email={emailToVerify} />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
