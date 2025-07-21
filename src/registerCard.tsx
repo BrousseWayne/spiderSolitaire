@@ -96,16 +96,12 @@ export function RegisterCard() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
-          <CardDescription>
+          <CardDescription className="whitespace-pre-wrap">
             Enter your email and password to register
           </CardDescription>
           <CardAction>
-            <Button
-              variant="link"
-              onClick={() => navigate("/login")}
-              className="cursor-pointer"
-            >
-              Already have an account?
+            <Button variant="link" onClick={() => navigate("/login")}>
+              Log In
             </Button>
           </CardAction>
         </CardHeader>
