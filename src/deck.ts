@@ -95,11 +95,11 @@ export default class Deck {
     this.fromJSON(this.savedDeck);
   }
 
-  get cards(): Card[] {
+  get cards(): CardType[] {
     return this.deck;
   }
 
-  draw(count: number = 1): Card[] {
+  draw(count: number = 1): CardType[] {
     if (count > this.deck.length) {
       throw new Error("Not enough cards in the deck.");
     }
