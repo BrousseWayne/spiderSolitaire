@@ -13,6 +13,7 @@ import { Profile } from "./profile.tsx";
 import { SecureRoutes } from "./secureRoutes.tsx";
 import ForgotPasswordCard from "./forgotPasswordCard.tsx";
 import { PasswordResetCard } from "./passwordResetCard.tsx";
+import { VerifyEmail } from "./verifyEmail.tsx";
 
 // function Landing() {
 //   const navigate = useNavigate();
@@ -50,6 +51,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/spidy" element={<App />} />
             <Route path="/forgot-password" element={<ForgotPasswordCard />} />
             <Route path="/password-reset" element={<PasswordResetCard />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
           </Routes>
         </GameStateProvider>
       </GameConfigProvider>
