@@ -114,6 +114,8 @@ export function LoginCard() {
 
   if (isVerified === false) {
     return <SpinnerUI email={emailToVerify} />;
+  } else {
+    navigate("/profile");
   }
 
   return (
