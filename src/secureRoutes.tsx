@@ -1,38 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
+import { useAuth } from "./authContext";
 
-export function SecureRoutes() {
-  const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+export default function SecureRoutes() {
   const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/verify-token", {
-          credentials: "include",
-        });
-        setAuthenticated(res.ok);
-      } catch {
-        setAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (!loading && !authenticated) {
+    if (!loading && !isAuthenticated) {
+      console.log(loading, isAuthenticated);
       navigate("/login");
     }
-  }, [loading, authenticated, navigate]);
+  }, [loading, isAuthenticated, navigate]);
 
-  if (loading || !authenticated) return null;
+  if (loading || !isAuthenticated) return null;
 
+  console.log("return outlet");
   return <Outlet />;
 }
-
-//TODO: spinner for the loading ?
-//TODO: Flash when navigating ??

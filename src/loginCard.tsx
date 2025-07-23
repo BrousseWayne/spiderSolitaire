@@ -112,10 +112,14 @@ export function LoginCard() {
     }
   };
 
+  useEffect(() => {
+    if (isVerified === true) {
+      navigate("/profile");
+    }
+  }, [isVerified, navigate]);
+
   if (isVerified === false) {
     return <SpinnerUI email={emailToVerify} />;
-  } else {
-    navigate("/profile");
   }
 
   return (
