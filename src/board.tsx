@@ -1,9 +1,15 @@
-import { useDroppable, type UniqueIdentifier } from "@dnd-kit/core";
+import {
+  useDraggable,
+  useDroppable,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
 import Card, { BackCard } from "./card";
 import type { BoardType, CardsInGame, CardType } from "./types";
 import type Deck from "./deck";
+import type { CSSProperties } from "react";
 
 interface StackProps {
+  stackArra: number;
   stack: CardsInGame[];
   stackIndex: number;
   activeId: UniqueIdentifier;
@@ -63,26 +69,51 @@ export function createBoard(deck: Deck): BoardType {
   return { cards: stacks, draw: draw };
 }
 
-export function Stack({ stack, stackIndex, activeId }: StackProps) {
+export function Stack({ stack, stackIndex, activeId, stackArea }: StackProps) {
   const { setNodeRef } = useDroppable({
+    id: `stackArea-${stackArea}`,
+  });
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: test,
+    transform,
+  } = useDraggable({
     id: `stack-${stackIndex}`,
   });
 
+  const draggableStyle: CSSProperties = {
+    position: "absolute",
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    zIndex: "auto",
+  };
+
   return (
-    <div ref={setNodeRef} className="stack">
-      {stack.map((card) => (
-        <Card
-          key={card.id}
-          title={`${card.suit}-${card.value}-${stackIndex}-${card.indexInStack}`}
-          suit={card.suit}
-          value={card.value}
-          activeId={activeId}
-          isDiscovered={card.isDiscovered}
-          style={{
-            top: `${card.indexInStack * 30}px`,
-          }}
-        />
-      ))}
+    <div ref={setNodeRef} className="stack-area">
+      <div
+        ref={test}
+        className="stack"
+        style={draggableStyle}
+        {...listeners}
+        {...attributes}
+      >
+        {stack.map((card) => (
+          <Card
+            key={card.id}
+            title={`${card.suit}-${card.value}-${stackIndex}-${card.indexInStack}`}
+            suit={card.suit}
+            value={card.value}
+            activeId={activeId}
+            isDiscovered={card.isDiscovered}
+            style={{
+              top: `${card.indexInStack * 30}px`,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -112,6 +143,7 @@ export function Board({ board, activeId }: BoardProps) {
     <div className="board">
       {board.map((stack, stackIndex) => (
         <Stack
+          stackArea={stackIndex}
           key={stackIndex}
           stack={stack}
           stackIndex={stackIndex}
@@ -131,3 +163,5 @@ export function Draw({ draw, onClick }: DrawPileProps) {
     </div>
   );
 }
+
+//TODO: duplicate state undo/redo

@@ -89,9 +89,17 @@
 }
 
 .stack {
+  position: absolute;
+  width: 100px;
+  height: 500px;
+  margin-left: 10px;
+}
+
+.stack-area {
   position: relative;
   width: 100px;
   height: 500px;
+  background-color: red;
 }
 
 .emptyStack {

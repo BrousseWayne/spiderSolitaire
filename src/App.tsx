@@ -36,6 +36,8 @@ function App() {
 
   const handleDragEnd = ({ over }: DragEndEvent) => {
     if (!over || !activeId) {
+      console.log("b4 dispatch", over, activeId);
+
       setMovingCards([]);
       return;
     }
@@ -47,12 +49,12 @@ function App() {
       cardIndex: parseInt(cardIndex),
     };
 
-    const destStackIndex = parseInt(over.id.replace("stack-", ""));
+    const destStackIndex = parseInt(over.id.replace("stackArea-", ""));
+    console.log(state.present, destStackIndex, over.id);
     const dest = {
       stackIndex: destStackIndex,
       cardIndex: state.present.cards[destStackIndex].length,
     };
-
     dispatch({ type: "MOVE_CARD", src, dest });
 
     setMovingCards([]);
