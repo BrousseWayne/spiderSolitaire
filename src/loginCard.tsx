@@ -33,7 +33,7 @@ export function SpinnerUI({ email }) {
 
         if (data.verified) {
           clearInterval(interval);
-          navigate("/spidy");
+          navigate("/onboarding");
         } else {
           setPollingAttempts((prev) => prev + 1);
         }
@@ -45,11 +45,31 @@ export function SpinnerUI({ email }) {
       } catch (err) {
         clearInterval(interval);
         navigate("/login");
+        console.error(err);
       }
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  });
+
+  const resendEmail = async () => {
+    try {
+      console.log("TEST");
+      const res = await fetch(
+        "http://localhost:3000/resend-verification-email",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+          }),
+        }
+      );
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
@@ -59,6 +79,13 @@ export function SpinnerUI({ email }) {
         Please check your inbox and click the verification link we sent to your
         email. This page will automatically update once your email is verified.
       </p>
+      <Button
+        variant="link"
+        onClick={() => resendEmail()}
+        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+      >
+        Resend email
+      </Button>
     </div>
   );
 }
