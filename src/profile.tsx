@@ -71,7 +71,8 @@ export function Profile() {
 
   const handleOnboardingSubmit = async () => {
     try {
-      await fetch("http://localhost:3000/profile/onboarding", {
+      console.log(nickname, defaultMode, picture);
+      await fetch("http://localhost:3000/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

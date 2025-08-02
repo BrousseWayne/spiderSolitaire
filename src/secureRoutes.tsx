@@ -4,6 +4,7 @@ import { useAuth } from "./authContext";
 
 export default function SecureRoutes() {
   const navigate = useNavigate();
+  console.log("B4 useAuth");
   const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {

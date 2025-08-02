@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "./authContext";
 
 export function SpinnerUI({ email }) {
   const [pollingAttempts, setPollingAttempts] = useState(0);
@@ -95,6 +96,7 @@ export function LoginCard() {
   const [isVerified, setIsVerified] = useState<boolean | null>(null);
   const [emailToVerify, setEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setIsAuthenticated } = useAuth();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -133,6 +135,7 @@ export function LoginCard() {
         return;
       }
 
+      setIsAuthenticated(true);
       setIsVerified(true);
     } catch (error) {
       console.error("Fetch error:", error);

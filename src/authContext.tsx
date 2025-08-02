@@ -8,6 +8,7 @@ import {
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  setIsAuthenticated: (a: React.SetStateAction<boolean>) => void;
   loading: boolean;
 };
 
@@ -16,8 +17,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  //TODO: add the user
-  console.log("Enter the context");
 
   useEffect(() => {
     const verify = async () => {
@@ -25,7 +24,6 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         const res = await fetch("http://localhost:3000/verify-token", {
           credentials: "include",
         });
-        console.log("server answer", res.ok);
         setIsAuthenticated(res.ok);
       } catch {
         setIsAuthenticated(false);
@@ -38,7 +36,9 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, setIsAuthenticated, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

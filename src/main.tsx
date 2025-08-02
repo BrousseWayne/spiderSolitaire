@@ -40,12 +40,15 @@ import SecureRoutes from "./secureRoutes.tsx";
 // }
 
 export function Logout() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const onClick = async () => {
-    await fetch("http://localhost:3000/logout", {
+    const res = await fetch("http://localhost:3000/logout", {
       method: "POST",
       credentials: "include",
     });
+    if (res.ok) {
+      setIsAuthenticated(false);
+    }
   };
 
   return isAuthenticated ? (
