@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { GameConfigProvider } from "./gameContext.tsx";
 
 // import { useGameConfig } from "./gameContext";
@@ -13,9 +13,9 @@ import { Profile } from "./profile.tsx";
 import ForgotPasswordCard from "./forgotPasswordCard.tsx";
 import { PasswordResetCard } from "./passwordResetCard.tsx";
 import { VerifyEmail } from "./verifyEmail.tsx";
-import { Button } from "./components/ui/button.tsx";
-import { AuthContextProvider, useAuth } from "./authContext.tsx";
+import { AuthContextProvider } from "./authContext.tsx";
 import SecureRoutes from "./secureRoutes.tsx";
+import { Layout } from "./Layout.tsx";
 
 // function Landing() {
 //   const navigate = useNavigate();
@@ -39,35 +39,8 @@ import SecureRoutes from "./secureRoutes.tsx";
 //   );
 // }
 
-export function Logout() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
-  const onClick = async () => {
-    const res = await fetch("http://localhost:3000/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (res.ok) {
-      setIsAuthenticated(false);
-    }
-  };
-
-  return isAuthenticated ? (
-    <Button variant={"outline"} onClick={onClick}>
-      Logout
-    </Button>
-  ) : null;
-}
-
-export function Layout() {
-  return (
-    <div className="app-layout">
-      <Logout />
-      <main className="app-content">
-        <Outlet />
-      </main>
-    </div>
-  );
-}
+//TODO: Redirect the user to the game sometimes perhaps
+//TODO: the redirect to the profile page should be only once (the user first login)
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

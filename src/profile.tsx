@@ -35,11 +35,11 @@ export function Profile() {
         credentials: "include",
       });
       const data = await res.json();
-      setProfile(data);
-      setNickname(data.nickname || "");
-      setDefaultMode(data.default_game_mode?.toString() || "");
-      setPicture(data.profile_picture || "");
-      setShowOnboarding(!data.hasCompletedOnboarding);
+      setProfile(data.user);
+      setNickname(data.user.nickname || "");
+      setDefaultMode(data.user.default_game_mode?.toString() || "");
+      setPicture(data.user.profile_picture || "");
+      setShowOnboarding(!data.user.hascompletedonboarding);
     } catch {
       setProfile(null);
     } finally {
@@ -83,7 +83,6 @@ export function Profile() {
         }),
       });
       setShowOnboarding(false);
-      fetchProfile();
     } catch (err) {
       console.error("Onboarding failed", err);
     }
@@ -192,7 +191,7 @@ export function Profile() {
         </CardContent>
       </Card>
 
-      <Dialog open={showOnboarding}>
+      <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
         <DialogContent className="space-y-4">
           <DialogHeader>
             <DialogTitle>
