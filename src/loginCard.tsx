@@ -105,6 +105,10 @@ export function LoginCard() {
     const password = formData.get("password")?.toString();
     console.log(email, password);
 
+    //TODO: Client for request
+    //TODO: env for hardcoded strings
+    //TODO: redirect to profile only when onboarding isnt completed
+
     try {
       const response = await fetch(`http://localhost:3000/login`, {
         method: "POST",
